@@ -1,5 +1,5 @@
 //
-//  ContentView.swift
+//  SetGameView.swift
 //  Set
 //
 //  Created by Robert Fasciano on 10/21/24.
@@ -7,12 +7,13 @@
 
 import SwiftUI
 
-struct ContentView: View {
+struct SetGameView: View {
+    
+    @ObservedObject var viewModel: BasicSetViewModel
+
     var body: some View {
         VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
+            viewModel.showCard(.Diamond)
             Image(systemName: "rectangle.stack.badge.plus")
             Spacer()
             bottomButtons
@@ -23,7 +24,7 @@ struct ContentView: View {
 
 var bottomButtons: some View {
     HStack {
-        addThreee
+        addThree
         Spacer()
         newGame
     }
@@ -42,7 +43,7 @@ var newGame: some View {
     }
 }
 
-var addThreee: some View {
+var addThree: some View {
     Button(action: {
 //        viewModel.shuffle() //user intent
     })
@@ -58,5 +59,5 @@ var addThreee: some View {
 
 
 #Preview {
-    ContentView()
+    SetGameView(viewModel: BasicSetViewModel())
 }
