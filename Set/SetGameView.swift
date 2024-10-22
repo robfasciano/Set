@@ -11,52 +11,53 @@ struct SetGameView: View {
     
     @ObservedObject var viewModel: BasicSetViewModel
 
+    private let aspectRatio: CGFloat = 2/3
+
     var body: some View {
         VStack {
             viewModel.showCard(.Diamond)
-            Image(systemName: "rectangle.stack.badge.plus")
             Spacer()
             bottomButtons
         }
         .padding()
     }
-}
-
-var bottomButtons: some View {
-    HStack {
-        addThree
-        Spacer()
-        newGame
+    
+    
+    var bottomButtons: some View {
+        HStack {
+            addThree
+            Spacer()
+            newGame
+        }
     }
-}
-
-var newGame: some View {
-    Button(action: {
-//        viewModel.shuffle() //user intent
-    })
-    {
-        VStack{
-            Image(systemName: "sparkles.rectangle.stack")
-                .font(.largeTitle)
-            Text("New")
+    
+    var newGame: some View {
+        Button(action: {
+            //        viewModel.shuffle() //user intent
+        })
+        {
+            VStack{
+                Image(systemName: "sparkles.rectangle.stack")
+                    .font(.largeTitle)
+                Text("New")
+            }
+        }
+    }
+    
+    var addThree: some View {
+        Button(action: {
+            viewModel.dealThreeCards() //user intent
+        })
+        {
+            VStack{
+                Image(systemName: "rectangle.stack.badge.plus")
+                    .font(.largeTitle)
+                    .symbolEffect(.wiggle.left.byLayer, options: .repeat(.periodic(delay: 2.0)))
+                Text("Add 3")
+            }
         }
     }
 }
-
-var addThree: some View {
-    Button(action: {
-//        viewModel.shuffle() //user intent
-    })
-    {
-        VStack{
-            Image(systemName: "rectangle.stack.badge.plus")
-                .font(.largeTitle)
-                .symbolEffect(.wiggle.left.byLayer, options: .repeat(.periodic(delay: 2.0)))
-            Text("Add 3")
-        }
-    }
-}
-
 
 #Preview {
     SetGameView(viewModel: BasicSetViewModel())

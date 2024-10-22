@@ -28,17 +28,22 @@ class BasicSetViewModel: ObservableObject {
    
     @ViewBuilder
     func showCard (_ drawShape: SetGame.cardSymbol) -> some View {
-        switch drawShape {
-        case .Diamond:
-            Circle()
-        case .Squiggle:
-            Rectangle()
-        case .Line:
-            RoundedRectangle(cornerRadius: 50)
+        ZStack {
+            switch drawShape {
+            case .Diamond:
+                Circle()
+            case .Squiggle:
+                Rectangle()
+            case .Line:
+                RoundedRectangle(cornerRadius: 50)
+            }
+            Text("\(model.faceUpCardCount)").foregroundStyle(.white)
         }
     }
     
     //MARK: Intents
-    
+    func dealThreeCards() {
+        model.dealThree()
+    }
 }
 

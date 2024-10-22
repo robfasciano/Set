@@ -27,7 +27,8 @@ struct SetGame {
                 }
             }
         }
-        print(cards)
+        cards.shuffle()
+//        print(cards)
     }
     
     
@@ -55,7 +56,23 @@ struct SetGame {
         case color3
     }
     
-
+    var faceUpCardCount: Int {
+        var count = 0
+        for i in cards {
+            if i.isFaceUp { count += 1}
+        }
+        return count
+    }
+    
+    mutating func dealThree() {
+        let startCard = faceUpCardCount
+        if startCard + 2 >= cards.count {
+            return
+        }
+        for i in 0..<3 {
+            cards[startCard + i].isFaceUp = true
+        }
+    }
     
     struct Card: CustomDebugStringConvertible {
         var debugDescription: String {
