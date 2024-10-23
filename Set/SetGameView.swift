@@ -15,13 +15,56 @@ struct SetGameView: View {
 
     var body: some View {
         VStack {
-            viewModel.showCard(.Diamond)
+            if viewModel.faceUpCards.count > 42 { //FIXME: this is a magic number tied to minGridWidth in AspectVGrid.  Not clear how to fix
+                ScrollView { //FIXME: scrollVIew is not allowing scroll to keep position (so can't select cards)
+                    cards
+                }
+            } else {
+                cards
+            }
             Spacer()
             bottomButtons
         }
         .padding()
     }
+ 
+    private var cards: some View {
+        AspectVGrid(viewModel.faceUpCards, aspectRatio: aspectRatio) { card in//cannot use For inside a view
+            CardView(card)
+                .padding(4)
+                .onTapGesture {
+                    viewModel.choose(card)
+                }
+        }
+        .foregroundStyle(.orange)
+    }
+
     
+    struct CardView: View {
+        let card: SetGame.Card
+        
+        init(_ card: SetGame.Card) {
+            self.card = card
+        }
+        
+        var body: some View {
+            ZStack{
+                let base = RoundedRectangle(cornerRadius: 12)
+                Group {
+                    base.foregroundStyle(.white)
+                    base.strokeBorder(lineWidth: card.isSelected ? 10 : 3)
+                    Text("test")
+                        .font(.system(size:200))
+                        .minimumScaleFactor(0.01)
+                        .aspectRatio(1, contentMode: .fit)
+                        .padding(10)
+                }
+                .opacity(card.isFaceUp ? 1 : 0)
+                base.opacity(card.isFaceUp ? 0 : 1)
+            }
+            .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
+        }
+    }
     
     var bottomButtons: some View {
         HStack {
@@ -33,7 +76,7 @@ struct SetGameView: View {
     
     var newGame: some View {
         Button(action: {
-            //        viewModel.shuffle() //user intent
+            //        viewModel.new() //user intent
         })
         {
             VStack{

@@ -25,7 +25,24 @@ class BasicSetViewModel: ObservableObject {
             return .purple
         }
     }
-   
+    
+    //this are the visibly face up cards, which means we exclude matched ones
+    var faceUpCards: Array<SetGame.Card> {
+//        return [model.cards[1], model.cards[2]]
+        //TODO: maybe more efficient to figure out how to filter correctly
+//        return model.cards.indices.filter { index in
+//                    model.cards[index]
+        var tempCards:Array<SetGame.Card> = []
+        for i in model.cards {
+            if i.isFaceUp && !i.isMatched {
+                tempCards.append(i)
+            }
+        }
+        return tempCards
+    }
+    
+    
+    
     @ViewBuilder
     func showCard (_ drawShape: SetGame.cardSymbol) -> some View {
         ZStack {
@@ -45,5 +62,10 @@ class BasicSetViewModel: ObservableObject {
     func dealThreeCards() {
         model.dealThree()
     }
+    
+    func choose(_ card: SetGame.Card) {
+        model.chooseCard(card)
+    }
+
 }
 

@@ -8,7 +8,7 @@
 import Foundation
 
 struct SetGame {
-    private(set) var cards: Array<Card>
+    var cards: Array<Card>
     
     init() {
 //        init(cards: Array<Card>) {
@@ -59,7 +59,7 @@ struct SetGame {
     var faceUpCardCount: Int {
         var count = 0
         for i in cards {
-            if i.isFaceUp { count += 1}
+            if i.isFaceUp && !i.isMatched { count += 1}
         }
         return count
     }
@@ -74,16 +74,39 @@ struct SetGame {
         }
     }
     
-    struct Card: CustomDebugStringConvertible {
+    
+    mutating func chooseCard(_ card: Card) {
+        cards[indexOfChosen(card)].isSelected = true //FIXME: this needs way more game logic
+    }
+    
+    
+    func indexOfChosen(_ card: Card) -> Int {
+        var cardIndex = 0
+        for i in cards {
+            if i.id == card.id {
+                return cardIndex
+            } else {
+                cardIndex += 1
+            }
+        }
+        return 0 //FIXME: this should really handle error here
+    }
+    
+    
+    struct Card: Identifiable, CustomDebugStringConvertible {
         var debugDescription: String {
             CardDebugString(self)
         }
         var isFaceUp = false
         var isMatched = false
+        var isSelected = false
         let symbol: cardSymbol
         let count: symbolCount
         let shading: symbolShading
         let color: symbolColor
+        var id: String {
+            CardDebugString(self)
+        }
         
         
         func CardDebugString(_ card: Card) -> String {
@@ -91,9 +114,9 @@ struct SetGame {
             
             switch card.count {
             case .one:
-                tempString.append("1 ")
+                tempString.append("1")
             case .two:
-                tempString.append("2 ")
+                tempString.append("2")
             case .three:
                 tempString.append("3")
             }
