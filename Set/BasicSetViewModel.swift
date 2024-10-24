@@ -61,11 +61,10 @@ class BasicSetViewModel: ObservableObject {
     //MARK: Intents
     func dealThreeCards() {
         model.dealThree()
-    }
+     }
     
     func newGame() {
         model = BasicSetViewModel.createSetGame()
-        usingMinGridWidth = false
     }
 
     func choose(_ card: SetGame.Card) {

@@ -6,14 +6,13 @@
 //
 
 import SwiftUI
-var usingMinGridWidth = false
 
 struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
     var items: [Item]
     var aspectRatio: CGFloat = 1
     var content: (Item) -> ItemView
     
-
+    
     init(_ items: [Item], aspectRatio: CGFloat, @ViewBuilder content: @escaping (Item) -> ItemView) {
         self.items = items
         self.aspectRatio = aspectRatio
@@ -21,7 +20,7 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
     }
     
     let minGridWidth: CGFloat = 90
-
+    
     var body: some View {
         GeometryReader { geometry in
             let gridItemSize = gridWidthThatFits(
@@ -29,19 +28,29 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
                 size: geometry.size,
                 atAspectRatio: aspectRatio
             )
-
-            usingMinGridWidth = (gridItemSize == minGridWidth)
-            print(usingMinGridWidth)
-            return LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize), spacing: 0)], spacing: 0) {
-                ForEach(items) { item in
-                    content(item) //creates a view from an item
-                        .aspectRatio(aspectRatio, contentMode: .fit)
-                    
+            
+//TODO: this totally works, but there is redundant code.  Maybe I can clean this up
+            if (gridItemSize == minGridWidth) {
+                ScrollView {
+                    LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize), spacing: 0)], spacing: 0) {
+                        ForEach(items) { item in
+                            content(item) //creates a view from an item
+                                .aspectRatio(aspectRatio, contentMode: .fit)
+                            
+                        }
+                    }
+                }
+            } else {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize), spacing: 0)], spacing: 0) {
+                    ForEach(items) { item in
+                        content(item) //creates a view from an item
+                            .aspectRatio(aspectRatio, contentMode: .fit)
+                        
+                    }
                 }
             }
         }
     }
-    
     
     
     func gridWidthThatFits (

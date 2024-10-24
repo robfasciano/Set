@@ -15,14 +15,8 @@ struct SetGameView: View {
 
     var body: some View {
         VStack {
-            if usingMinGridWidth {
-                ScrollView { //FIXME: scrollVIew is not allowing scroll to keep position (so can't select cards)
-                        cards.border(.blue, width: 4)
-                }
-            } else {
-                cards.border(.blue, width: 4)
-                Spacer()
-            }
+            cards.border(.blue, width: 4)
+            Spacer()
             bottomButtons
         }
         .padding()
