@@ -15,21 +15,21 @@ struct SetGameView: View {
 
     var body: some View {
         VStack {
-            if viewModel.faceUpCards.count > 42 { //FIXME: this is a magic number tied to minGridWidth in AspectVGrid.  Not clear how to fix
+            if usingMinGridWidth {
                 ScrollView { //FIXME: scrollVIew is not allowing scroll to keep position (so can't select cards)
-                    cards
+                        cards.border(.blue, width: 4)
                 }
             } else {
-                cards
+                cards.border(.blue, width: 4)
+                Spacer()
             }
-            Spacer()
             bottomButtons
         }
         .padding()
     }
  
     private var cards: some View {
-        AspectVGrid(viewModel.faceUpCards, aspectRatio: aspectRatio) { card in//cannot use For inside a view
+        AspectVGrid(viewModel.faceUpCards, aspectRatio: aspectRatio) { card in
             CardView(card)
                 .padding(4)
                 .onTapGesture {
@@ -76,7 +76,7 @@ struct SetGameView: View {
     
     var newGame: some View {
         Button(action: {
-            //        viewModel.new() //user intent
+            viewModel.newGame() //user intent
         })
         {
             VStack{

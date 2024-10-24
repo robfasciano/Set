@@ -63,6 +63,11 @@ class BasicSetViewModel: ObservableObject {
         model.dealThree()
     }
     
+    func newGame() {
+        model = BasicSetViewModel.createSetGame()
+        usingMinGridWidth = false
+    }
+
     func choose(_ card: SetGame.Card) {
         model.chooseCard(card)
     }
