@@ -76,7 +76,6 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
             
         } while columnCount < count
         returnValue =  max(min(size.width / count, size.height * aspectRatio).rounded(.down), minGridWidth)
-        print("\(returnValue)!")
         return returnValue
     }
     

@@ -15,16 +15,6 @@ class BasicSetViewModel: ObservableObject {
     
     @Published private var model = createSetGame()
     
-    func cardColor(_ which: SetGame.symbolColor) -> Color {
-        switch which {
-        case .color1:
-            return .red
-        case .color2:
-            return .green
-        case .color3:
-            return .purple
-        }
-    }
     
     //this are the visibly face up cards, which means we exclude matched ones
     var faceUpCards: Array<SetGame.Card> {
@@ -42,20 +32,69 @@ class BasicSetViewModel: ObservableObject {
     }
     
     
-    
-    @ViewBuilder
-    func showCard (_ drawShape: SetGame.cardSymbol) -> some View {
-        ZStack {
-            switch drawShape {
-            case .Diamond:
-                Circle()
-            case .Squiggle:
-                Rectangle()
-            case .Line:
-                RoundedRectangle(cornerRadius: 50)
-            }
-            Text("\(model.faceUpCardCount)").foregroundStyle(.white)
+//    @ViewBuilder
+    struct show:View {
+        let card: SetGame.Card
+        
+        init(_ card: SetGame.Card) {
+            self.card = card
         }
+        var body: some View {
+            VStack {
+                ForEach(0..<count(card)) { _ in
+                    switch card.symbol {
+                    case .Diamond:
+                        Circle().fill(Gradient(colors: pattern(card)))
+                            .stroke(color(card), lineWidth: 4)
+                            .aspectRatio(2.5, contentMode: .fit)
+                    case .Squiggle:
+                        Rectangle().fill(Gradient(colors: pattern(card)))
+                            .stroke(color(card), lineWidth: 4)
+                            .aspectRatio(3.0, contentMode: .fit)
+                    case .Line:
+                        RoundedRectangle(cornerRadius: 50).fill(Gradient(colors: pattern(card)))
+                            .stroke(color(card), lineWidth: 4)
+                            .aspectRatio(3.0, contentMode: .fit)
+                    }
+                }
+            }
+            .padding(15)
+        }
+      
+        func pattern(_ which: SetGame.Card) -> [Color] {
+            switch which.shading {
+            case .open:
+                return [.white]
+            case .striped:
+                return [color(card), .white, color(card), .white, color(card), .white, color(card)]
+            case .filled:
+                return [color(card)]
+            }
+        }
+        
+        func color(_ which: SetGame.Card) -> Color {
+            switch which.color {
+            case .color1:
+                return .red
+            case .color2:
+                return .green
+            case .color3:
+                return .purple
+            }
+        }
+        
+        func count(_ which: SetGame.Card) -> Int {
+            switch which.count {
+            case .one:
+                return 1
+            case .two:
+                return 2
+            case .three:
+                return 3
+            }
+        }
+
+
     }
     
     //MARK: Intents

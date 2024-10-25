@@ -28,7 +28,6 @@ struct SetGame {
             }
         }
         cards.shuffle()
-//        print(cards)
     }
     
     

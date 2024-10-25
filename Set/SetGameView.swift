@@ -30,7 +30,6 @@ struct SetGameView: View {
                     viewModel.choose(card)
                 }
         }
-        .foregroundStyle(.orange)
     }
 
     
@@ -46,12 +45,8 @@ struct SetGameView: View {
                 let base = RoundedRectangle(cornerRadius: 12)
                 Group {
                     base.foregroundStyle(.white)
-                    base.strokeBorder(lineWidth: card.isSelected ? 10 : 3)
-                    Text("test")
-                        .font(.system(size:200))
-                        .minimumScaleFactor(0.01)
-                        .aspectRatio(1, contentMode: .fit)
-                        .padding(10)
+                    base.strokeBorder(lineWidth: card.isSelected ? 10 : 3)        .foregroundStyle(.orange)
+                    BasicSetViewModel.show(card)
                 }
                 .opacity(card.isFaceUp ? 1 : 0)
                 base.opacity(card.isFaceUp ? 0 : 1)
