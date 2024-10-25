@@ -58,26 +58,139 @@ struct SetGame {
     var faceUpCardCount: Int {
         var count = 0
         for i in cards {
-            if i.isFaceUp && !i.isMatched { count += 1}
+            if i.isDealt && !i.isMatched { count += 1}
         }
         return count
     }
     
-    mutating func dealThree() {
-        let startCard = faceUpCardCount
-        if startCard + 2 >= cards.count {
-            return
-        }
-        for i in 0..<3 {
-            cards[startCard + i].isFaceUp = true
+    mutating func deal(_ toDeal: Int) {
+        var dealCount = 0
+        for i in 0..<cards.count {
+            if !cards[i].isDealt {
+                cards[i].isDealt = true
+                dealCount += 1
+                if dealCount == toDeal {
+                    return
+                }
+            }
         }
     }
     
     
     mutating func chooseCard(_ card: Card) {
-        cards[indexOfChosen(card)].isSelected = true //FIXME: this needs way more game logic
+        cards[indexOfChosen(card)].isSelected.toggle()
+        print(card)
+        if numberOfSelectedCards == 3 {
+            if matchedSetSelected() {
+                removeMatch()
+                deal(3)
+            }
+            deselectAll()
+        }
     }
     
+    
+    mutating func deselectAll() {
+        for i in cards.indices {
+            cards[i].isSelected = false
+        }
+    }
+    
+    
+    var numberOfSelectedCards: Int {
+        var selectionCount = 0
+        for i in cards {
+            if i.isDealt && i.isSelected { selectionCount += 1}
+        }
+        return selectionCount
+    }
+    
+    
+    //MARK: funcs to check matching
+    func matchedSetSelected() -> Bool {
+        let cardsToCheck = getThreeCards()
+        if colorSet(cardsToCheck)
+            && symbolSet(cardsToCheck)
+            && shadingSet(cardsToCheck)
+            && numberSet(cardsToCheck) {
+            return true
+        }
+        return false
+    }
+
+
+    func colorSet(_ cardsSelected: [Card]) -> Bool {
+        if cardsSelected[0].color == cardsSelected[1].color
+            && cardsSelected[0].color == cardsSelected[2].color {
+            return true
+        }
+        if cardsSelected[0].color != cardsSelected[1].color
+            && cardsSelected[0].color != cardsSelected[2].color
+            && cardsSelected[1].color != cardsSelected[2].color {
+            return true
+        }
+        return false
+    }
+
+    func symbolSet(_ cardsSelected: [Card]) -> Bool {
+        if cardsSelected[0].symbol == cardsSelected[1].symbol
+            && cardsSelected[0].symbol == cardsSelected[2].symbol {
+            return true
+        }
+        if cardsSelected[0].symbol != cardsSelected[1].symbol
+            && cardsSelected[0].symbol != cardsSelected[2].symbol
+            && cardsSelected[1].symbol != cardsSelected[2].symbol {
+            return true
+        }
+        return false
+    }
+
+    func shadingSet(_ cardsSelected: [Card]) -> Bool {
+        if cardsSelected[0].shading == cardsSelected[1].shading
+            && cardsSelected[0].shading == cardsSelected[2].shading {
+            return true
+        }
+        if cardsSelected[0].shading != cardsSelected[1].shading
+            && cardsSelected[0].shading != cardsSelected[2].shading
+            && cardsSelected[1].shading != cardsSelected[2].shading {
+            return true
+        }
+        return false
+    }
+
+    func numberSet(_ cardsSelected: [Card]) -> Bool {
+        if cardsSelected[0].count == cardsSelected[1].count
+            && cardsSelected[0].count == cardsSelected[2].count {
+            return true
+        }
+        if cardsSelected[0].count != cardsSelected[1].count
+            && cardsSelected[0].count != cardsSelected[2].count
+            && cardsSelected[1].count != cardsSelected[2].count {
+            return true
+        }
+        return false
+    }
+
+    func getThreeCards() -> [Card] {
+        var returnVal: Array<Card> = []
+        for i in cards {
+            if i.isSelected {
+                returnVal.append(i)
+            }
+        }
+        return returnVal
+    }
+    
+    
+    mutating func removeMatch() {
+        for i in cards.indices {
+            if cards[i].isSelected {
+                cards[i].isMatched = true
+                cards[i].isSelected = false
+            }
+        }
+
+    }
     
     func indexOfChosen(_ card: Card) -> Int {
         var cardIndex = 0
@@ -92,11 +205,12 @@ struct SetGame {
     }
     
     
-    struct Card: Identifiable, CustomDebugStringConvertible {
+    
+    struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
         var debugDescription: String {
             CardDebugString(self)
         }
-        var isFaceUp = false
+        var isDealt = false
         var isMatched = false
         var isSelected = false
         let symbol: cardSymbol

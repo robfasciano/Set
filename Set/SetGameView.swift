@@ -15,7 +15,7 @@ struct SetGameView: View {
 
     var body: some View {
         VStack {
-            cards.border(.blue, width: 4)
+            cards.animation(.default, value: viewModel.cards)
             Spacer()
             bottomButtons
         }
@@ -45,13 +45,14 @@ struct SetGameView: View {
                 let base = RoundedRectangle(cornerRadius: 12)
                 Group {
                     base.foregroundStyle(.white)
-                    base.strokeBorder(lineWidth: card.isSelected ? 10 : 3)        .foregroundStyle(.orange)
+                    base.strokeBorder(lineWidth: card.isSelected ? 10 : 3)
+                        .foregroundStyle(.orange)
                     BasicSetViewModel.show(card)
                 }
-                .opacity(card.isFaceUp ? 1 : 0)
-                base.opacity(card.isFaceUp ? 0 : 1)
+                .opacity(card.isDealt ? 1 : 0)
+                base.opacity(card.isDealt ? 0 : 1)
             }
-            .opacity(card.isFaceUp || !card.isMatched ? 1 : 0)
+            .opacity(card.isDealt || !card.isMatched ? 1 : 0)
         }
     }
     

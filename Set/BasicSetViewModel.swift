@@ -18,13 +18,9 @@ class BasicSetViewModel: ObservableObject {
     
     //this are the visibly face up cards, which means we exclude matched ones
     var faceUpCards: Array<SetGame.Card> {
-//        return [model.cards[1], model.cards[2]]
-        //TODO: maybe more efficient to figure out how to filter correctly
-//        return model.cards.indices.filter { index in
-//                    model.cards[index]
         var tempCards:Array<SetGame.Card> = []
         for i in model.cards {
-            if i.isFaceUp && !i.isMatched {
+            if i.isDealt && !i.isMatched {
                 tempCards.append(i)
             }
         }
@@ -41,7 +37,7 @@ class BasicSetViewModel: ObservableObject {
         }
         var body: some View {
             VStack {
-                ForEach(0..<count(card)) { _ in
+                ForEach(0..<count(card)) { _ in //FIXME: unpredictable behavior,  must fix (somehow!)
                     switch card.symbol {
                     case .Diamond:
                         Circle().fill(Gradient(colors: pattern(card)))
@@ -66,7 +62,7 @@ class BasicSetViewModel: ObservableObject {
             case .open:
                 return [.white]
             case .striped:
-                return [color(card), .white, color(card), .white, color(card), .white, color(card)]
+                return [color(card), .white, color(card), .white, color(card), .white, color(card), .white, color(card)]
             case .filled:
                 return [color(card)]
             }
@@ -93,17 +89,21 @@ class BasicSetViewModel: ObservableObject {
                 return 3
             }
         }
-
-
     }
+    
+    var cards: Array<SetGame.Card> {
+        return model.cards
+    }
+
     
     //MARK: Intents
     func dealThreeCards() {
-        model.dealThree()
+        model.deal(3)
      }
     
     func newGame() {
         model = BasicSetViewModel.createSetGame()
+        model.deal(12)
     }
 
     func choose(_ card: SetGame.Card) {

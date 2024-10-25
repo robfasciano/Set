@@ -36,7 +36,6 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
                         ForEach(items) { item in
                             content(item) //creates a view from an item
                                 .aspectRatio(aspectRatio, contentMode: .fit)
-                            
                         }
                     }
                 }
@@ -45,7 +44,6 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
                     ForEach(items) { item in
                         content(item) //creates a view from an item
                             .aspectRatio(aspectRatio, contentMode: .fit)
-                        
                     }
                 }
             }
@@ -69,7 +67,6 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
             let rowCount = (count / columnCount).rounded(.up)
             if rowCount * height < size.height {
                 returnValue = max((size.width / columnCount).rounded(.down), minGridWidth)
-                print(returnValue)
                 return returnValue
             }
             columnCount += 1
