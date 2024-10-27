@@ -32,7 +32,6 @@ struct SetGameView: View {
                     viewModel.choose(card)
                 }
         }
-        .border(.red)
     }
 
     
