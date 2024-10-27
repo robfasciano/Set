@@ -32,6 +32,7 @@ struct SetGameView: View {
                     viewModel.choose(card)
                 }
         }
+        .border(.red)
     }
 
     
@@ -55,6 +56,7 @@ struct SetGameView: View {
                 }
             }
             .opacity(card.isDealt || !card.isMatched ? 1 : 0)
+
         }
     }
     

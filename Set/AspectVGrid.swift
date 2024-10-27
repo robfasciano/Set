@@ -40,7 +40,7 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
                     }
                 }
             } else {
-                LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize), spacing: 0)], spacing: 0) {
+                LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize, maximum: geometry.size.height*aspectRatio), spacing: 0)], spacing: 0) {
                     ForEach(items) { item in
                         content(item) //creates a view from an item
                             .aspectRatio(aspectRatio, contentMode: .fit)
@@ -60,6 +60,7 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
         let count = CGFloat(count)
         var columnCount = 1.0
         var returnValue = 0.0
+
         repeat {
             let width = size.width / columnCount
             let height = width / aspectRatio

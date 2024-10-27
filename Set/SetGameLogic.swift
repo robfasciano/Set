@@ -99,7 +99,6 @@ struct SetGame {
     
     
     mutating func chooseCard(_ card: Card) {
-        print(card)
         if numberOfSelectedCards < 3 {
             cards[indexOfChosen(card)].isSelected.toggle()
         } else {
@@ -110,7 +109,6 @@ struct SetGame {
             deselectAll()
             if !cards[indexOfChosen(card)].isMatched {
                 cards[indexOfChosen(card)].isSelected = true
-                print("Selected \(card) \(card.isMatched)")
             }
         }
     }
@@ -216,7 +214,6 @@ struct SetGame {
             for j in i+1..<faceUpCards.count {
                 for k in j+1..<faceUpCards.count {
                     if threeCardsMatch([faceUpCards[i], faceUpCards[j], faceUpCards[k]]) {
-                        print([faceUpCards[i], faceUpCards[j], faceUpCards[k]])
                         return true
                     }
                 }
