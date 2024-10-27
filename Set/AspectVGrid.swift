@@ -19,7 +19,7 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
         self.content = content
     }
     
-    let minGridWidth: CGFloat = 90
+    let minGridWidth: CGFloat = 80
     
     var body: some View {
         GeometryReader { geometry in

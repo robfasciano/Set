@@ -15,78 +15,93 @@ class BasicSetViewModel: ObservableObject {
     
     @Published private var model = createSetGame()
     
-    
-    //this are the visibly face up cards, which means we exclude matched ones
     var faceUpCards: Array<SetGame.Card> {
-        var tempCards:Array<SetGame.Card> = []
-        for i in model.cards {
-            if i.isDealt && !i.isMatched {
-                tempCards.append(i)
-            }
-        }
-        return tempCards
+        return model.faceUpCards
     }
     
-    
-//    @ViewBuilder
+    let cardBackground: Color = .white
+    let cardMatchBackground: Color = Color(red: 0.826, green: 1.00, blue: 0.870) //light green
+    let cardMismatchBackground: Color = Color(red: 1.0, green: 0.909, blue: 0.926) //light red
+
+
     struct show:View {
         let card: SetGame.Card
-        
-        init(_ card: SetGame.Card) {
+        let backColor: Color
+
+        init(_ card: SetGame.Card, _ backColor: Color) {
             self.card = card
+            self.backColor = backColor
         }
         var body: some View {
             VStack {
-                ForEach(0..<count(card)) { _ in //FIXME: unpredictable behavior,  must fix (somehow!)
-                    switch card.symbol {
-                    case .Diamond:
-                        Circle().fill(Gradient(colors: pattern(card)))
-                            .stroke(color(card), lineWidth: 4)
-                            .aspectRatio(2.5, contentMode: .fit)
-                    case .Squiggle:
-                        Rectangle().fill(Gradient(colors: pattern(card)))
-                            .stroke(color(card), lineWidth: 4)
-                            .aspectRatio(3.0, contentMode: .fit)
-                    case .Line:
-                        RoundedRectangle(cornerRadius: 50).fill(Gradient(colors: pattern(card)))
-                            .stroke(color(card), lineWidth: 4)
-                            .aspectRatio(3.0, contentMode: .fit)
-                    }
+                switch card.count { //leaving as enums.  Maybe I will want .one to be 4?
+                case .one:
+                    oneShape(card, backColor)
+                case .two:
+                    oneShape(card, backColor)
+                    oneShape(card, backColor)
+                case .three:
+                    oneShape(card, backColor)
+                    oneShape(card, backColor)
+                    oneShape(card, backColor)
                 }
             }
             .padding(15)
         }
-      
-        func pattern(_ which: SetGame.Card) -> [Color] {
-            switch which.shading {
-            case .open:
-                return [.white]
-            case .striped:
-                return [color(card), .white, color(card), .white, color(card), .white, color(card), .white, color(card)]
-            case .filled:
-                return [color(card)]
-            }
-        }
         
-        func color(_ which: SetGame.Card) -> Color {
-            switch which.color {
-            case .color1:
-                return .red
-            case .color2:
-                return .green
-            case .color3:
-                return .purple
-            }
-        }
         
-        func count(_ which: SetGame.Card) -> Int {
-            switch which.count {
-            case .one:
-                return 1
-            case .two:
-                return 2
-            case .three:
-                return 3
+        struct oneShape: View {
+            let card: SetGame.Card
+            let backColor: Color
+            
+            init(_ card: SetGame.Card, _ backColor: Color) {
+                self.card = card
+                self.backColor = backColor
+            }
+            
+            var body: some View {
+                switch card.symbol {
+                case .Diamond:
+                    Circle().fill(Gradient(colors: pattern(card, backColor)))
+                        .stroke(color(card), lineWidth: 4)
+                        .aspectRatio(2.5, contentMode: .fit)
+                case .Squiggle:
+                    Rectangle().fill(Gradient(colors: pattern(card, backColor)))
+                        .stroke(color(card), lineWidth: 4)
+                        .aspectRatio(3.0, contentMode: .fit)
+                case .Line:
+                    RoundedRectangle(cornerRadius: 50).fill(Gradient(colors: pattern(card, backColor)))
+                        .stroke(color(card), lineWidth: 4)
+                        .aspectRatio(3.0, contentMode: .fit)
+                }
+            }
+            
+            
+            func pattern(_ which: SetGame.Card, _ backColor: Color) -> [Color] {
+                switch which.shading {
+                case .open:
+                    return [backColor]
+                case .striped:
+                    var colorArray = [color(card)]
+                    for _ in 1...4 {
+                        colorArray.append(backColor)
+                        colorArray.append(color(card))
+                    }
+                    return colorArray
+                case .filled:
+                    return [color(card)]
+                }
+            }
+            
+            func color(_ which: SetGame.Card) -> Color {
+                switch which.color {
+                case .color1:
+                    return .red
+                case .color2:
+                    return .green
+                case .color3:
+                    return .purple
+                }
             }
         }
     }
@@ -95,9 +110,35 @@ class BasicSetViewModel: ObservableObject {
         return model.cards
     }
 
+    var anyVisibleMatches: Bool {
+        return model.anyVisibleMatches
+    }
+
+    var matchedCards: Bool {
+        if threeCardsSelected {
+            if model.matchedSetSelected() {
+                return true
+            }
+        }
+        return false
+    }
+
+    var cardsInDeck: Int {
+        return model.cardsLeftInDeck
+    }
     
+    var threeCardsSelected: Bool {
+        return model.getSelectedCards().count == 3
+    }
+
     //MARK: Intents
     func dealThreeCards() {
+        if model.numberOfSelectedCards == 3 {
+            if model.matchedSetSelected() {
+                model.removeMatch()
+                model.deselectAll()
+            }
+        }
         model.deal(3)
      }
     

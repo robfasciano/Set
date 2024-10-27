@@ -30,7 +30,6 @@ struct SetGame {
         cards.shuffle()
     }
     
-    
     enum cardSymbol {
         case Diamond
         case Squiggle
@@ -55,6 +54,16 @@ struct SetGame {
         case color3
     }
     
+    var cardsLeftInDeck: Int {
+        var count = 0
+        for i in cards {
+            if !i.isDealt {
+                count += 1
+            }
+        }
+        return count
+    }
+    
     var faceUpCardCount: Int {
         var count = 0
         for i in cards {
@@ -62,6 +71,18 @@ struct SetGame {
         }
         return count
     }
+
+    //this are the visibly face up cards, which means we exclude matched ones
+    var faceUpCards: Array<Card> {
+        var tempCards:Array<Card> = []
+        for i in cards {
+            if i.isDealt && !i.isMatched {
+                tempCards.append(i)
+            }
+        }
+        return tempCards
+    }
+
     
     mutating func deal(_ toDeal: Int) {
         var dealCount = 0
@@ -78,14 +99,19 @@ struct SetGame {
     
     
     mutating func chooseCard(_ card: Card) {
-        cards[indexOfChosen(card)].isSelected.toggle()
         print(card)
-        if numberOfSelectedCards == 3 {
+        if numberOfSelectedCards < 3 {
+            cards[indexOfChosen(card)].isSelected.toggle()
+        } else {
             if matchedSetSelected() {
                 removeMatch()
                 deal(3)
             }
             deselectAll()
+            if !cards[indexOfChosen(card)].isMatched {
+                cards[indexOfChosen(card)].isSelected = true
+                print("Selected \(card) \(card.isMatched)")
+            }
         }
     }
     
@@ -107,8 +133,7 @@ struct SetGame {
     
     
     //MARK: funcs to check matching
-    func matchedSetSelected() -> Bool {
-        let cardsToCheck = getThreeCards()
+    func threeCardsMatch(_ cardsToCheck: [Card]) -> Bool {
         if colorSet(cardsToCheck)
             && symbolSet(cardsToCheck)
             && shadingSet(cardsToCheck)
@@ -116,6 +141,10 @@ struct SetGame {
             return true
         }
         return false
+    }
+    
+    func matchedSetSelected() -> Bool {
+        threeCardsMatch(getSelectedCards())
     }
 
 
@@ -171,7 +200,7 @@ struct SetGame {
         return false
     }
 
-    func getThreeCards() -> [Card] {
+    func getSelectedCards() -> [Card] {
         var returnVal: Array<Card> = []
         for i in cards {
             if i.isSelected {
@@ -181,6 +210,20 @@ struct SetGame {
         return returnVal
     }
     
+    
+    var anyVisibleMatches: Bool {
+        for i in 0..<faceUpCards.count {
+            for j in i+1..<faceUpCards.count {
+                for k in j+1..<faceUpCards.count {
+                    if threeCardsMatch([faceUpCards[i], faceUpCards[j], faceUpCards[k]]) {
+                        print([faceUpCards[i], faceUpCards[j], faceUpCards[k]])
+                        return true
+                    }
+                }
+            }
+        }
+        return false
+    }
     
     mutating func removeMatch() {
         for i in cards.indices {
@@ -223,7 +266,7 @@ struct SetGame {
         
         
         func CardDebugString(_ card: Card) -> String {
-            var tempString = "\r\n"
+            var tempString = ""
             
             switch card.count {
             case .one:
