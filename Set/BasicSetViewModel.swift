@@ -62,9 +62,9 @@ class BasicSetViewModel: ObservableObject {
             var body: some View {
                 switch card.symbol {
                 case .Diamond:
-                    Circle().fill(Gradient(colors: pattern(card, backColor)))
+                    Diamond().fill(Gradient(colors: pattern(card, backColor)))
                         .stroke(color(card), lineWidth: 4)
-                        .aspectRatio(2.5, contentMode: .fit)
+                        .aspectRatio(3.0, contentMode: .fit)
                 case .Squiggle:
                     Rectangle().fill(Gradient(colors: pattern(card, backColor)))
                         .stroke(color(card), lineWidth: 4)

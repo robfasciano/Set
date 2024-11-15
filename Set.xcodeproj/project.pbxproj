@@ -6,7 +6,12 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		1E3FFFD62CE77E3E00D11987 /* Diamond.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E3FFFD52CE77E3E00D11987 /* Diamond.swift */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
+		1E3FFFD52CE77E3E00D11987 /* Diamond.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Diamond.swift; sourceTree = "<group>"; };
 		1EDAE6932CC67045005BC26D /* Set.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Set.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -32,6 +37,7 @@
 		1EDAE68A2CC67045005BC26D = {
 			isa = PBXGroup;
 			children = (
+				1E3FFFD52CE77E3E00D11987 /* Diamond.swift */,
 				1EDAE6952CC67045005BC26D /* Set */,
 				1EDAE6942CC67045005BC26D /* Products */,
 			);
@@ -119,6 +125,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1E3FFFD62CE77E3E00D11987 /* Diamond.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
