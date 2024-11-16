@@ -62,17 +62,26 @@ class BasicSetViewModel: ObservableObject {
             var body: some View {
                 switch card.symbol {
                 case .Diamond:
-                    Diamond().fill(Gradient(colors: pattern(card, backColor)))
-                        .stroke(color(card), lineWidth: 4)
-                        .aspectRatio(3.0, contentMode: .fit)
+                    Diamond().fill(LinearGradient(colors: pattern(card, backColor),
+                                        startPoint: UnitPoint(x: 0, y: 0),
+                                        endPoint: UnitPoint(x: 1, y: 0)))
+                    .stroke(color(card), lineWidth: 4)
+                    .aspectRatio(3.0, contentMode: .fit)
+                    
                 case .Squiggle:
-                    Rectangle().fill(Gradient(colors: pattern(card, backColor)))
-                        .stroke(color(card), lineWidth: 4)
-                        .aspectRatio(3.0, contentMode: .fit)
+                    Squiggle().fill(
+                        LinearGradient(colors: pattern(card, backColor),
+                                       startPoint: UnitPoint(x: 0, y: 1.5),
+                                       endPoint: UnitPoint(x: 1, y: 0)))
+                    .stroke(color(card), lineWidth: 4)
+                    .rotationEffect(Angle(degrees: 25))
+                    .aspectRatio(3.0, contentMode: .fit)
                 case .Line:
-                    RoundedRectangle(cornerRadius: 50).fill(Gradient(colors: pattern(card, backColor)))
-                        .stroke(color(card), lineWidth: 4)
-                        .aspectRatio(3.0, contentMode: .fit)
+                    RoundedRectangle(cornerRadius: 50).fill(LinearGradient(colors: pattern(card, backColor),
+                                        startPoint: UnitPoint(x: 0, y: 0),
+                                        endPoint: UnitPoint(x: 1, y: 0)))
+                    .stroke(color(card), lineWidth: 4)
+                    .aspectRatio(3.0, contentMode: .fit)
                 }
             }
             
@@ -83,7 +92,7 @@ class BasicSetViewModel: ObservableObject {
                     return [backColor]
                 case .striped:
                     var colorArray = [color(card)]
-                    for _ in 1...4 {
+                    for _ in 1...20 {
                         colorArray.append(backColor)
                         colorArray.append(color(card))
                     }
