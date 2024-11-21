@@ -12,10 +12,17 @@ struct SetGameView: View {
     @ObservedObject var viewModel: BasicSetViewModel
 
     private let aspectRatio: CGFloat = 2/3
+    
 
     var body: some View {
         VStack {
-            cards.animation(.default, value: viewModel.cards)
+            HStack{
+                discardPlayer1
+                cards.animation(.default, value: viewModel.cards)
+                if viewModel.numPlayers == 2 {
+                    discardPlayer2
+                }
+            }
             Spacer()
             bottomButtons
         }
@@ -82,7 +89,34 @@ struct SetGameView: View {
         }
     }
     
+    var discardPlayer1: some View {
+        VStack {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .aspectRatio(2/3, contentMode: .fill)
+                    .frame(width: 45, height: 50)
+                    .foregroundStyle(.blue)
+                Text("\(viewModel.cardsInDeck)")
+                    .foregroundStyle(.white).font(.largeTitle)
+            }
+            Text("Player 1")
+        }
+    }
     
+    var discardPlayer2: some View {
+        VStack {
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .aspectRatio(2/3, contentMode: .fill)
+                    .frame(width: 45, height: 50)
+                    .foregroundStyle(.blue)
+                Text("\(viewModel.cardsInDeck)")
+                    .foregroundStyle(.white).font(.largeTitle)
+            }
+            Text("Player 2")
+        }
+    }
+
     var deck: some View {
         ZStack {
             RoundedRectangle(cornerRadius: 12)

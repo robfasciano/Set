@@ -133,11 +133,15 @@ class BasicSetViewModel: ObservableObject {
     }
 
     var cardsInDeck: Int {
-        return model.cardsLeftInDeck
+        model.cardsLeftInDeck
     }
     
     var threeCardsSelected: Bool {
-        return model.getSelectedCards().count == 3
+        model.getSelectedCards().count == 3
+    }
+    
+    var numPlayers: Int {
+        return 1
     }
 
     //MARK: Intents
