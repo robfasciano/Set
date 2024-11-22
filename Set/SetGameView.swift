@@ -92,12 +92,8 @@ struct SetGameView: View {
     var discardPlayer1: some View {
         VStack {
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .aspectRatio(2/3, contentMode: .fill)
-                    .frame(width: 45, height: 50)
-                    .foregroundStyle(.blue)
-                Text("\(viewModel.cardsInDeck)")
-                    .foregroundStyle(.white).font(.largeTitle)
+                cardOutline(color: .blue)
+                //add discard pile
             }
             Text("Player 1")
         }
@@ -106,12 +102,8 @@ struct SetGameView: View {
     var discardPlayer2: some View {
         VStack {
             ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .aspectRatio(2/3, contentMode: .fill)
-                    .frame(width: 45, height: 50)
-                    .foregroundStyle(.blue)
-                Text("\(viewModel.cardsInDeck)")
-                    .foregroundStyle(.white).font(.largeTitle)
+                cardOutline(color: .blue)
+
             }
             Text("Player 2")
         }
@@ -119,16 +111,33 @@ struct SetGameView: View {
 
     var deck: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 12)
-                .aspectRatio(2/3, contentMode: .fill)
-                .frame(width: 45, height: 50)
-                .foregroundStyle(.blue)
-            Text("\(viewModel.cardsInDeck)")
-                .foregroundStyle(.white).font(.largeTitle)
+            if viewModel.cardsLeftInDeck == 0 {
+                cardOutline(color: .blue)
+            }
+            cardShape(color: .blue)
+            Text("\(viewModel.cardsLeftInDeck)")
+                    .foregroundStyle(.white).font(.largeTitle)
+            }
         }
+    
+    let myShape = RoundedRectangle(cornerRadius: 12)
+
+    private func cardShape(color: Color) -> some View {
+         myShape
+            .aspectRatio(2/3, contentMode: .fill)
+            .frame(width: 45, height: 50)
+            .foregroundStyle(color)
     }
     
     
+    private func cardOutline(color: Color) -> some View {
+        return myShape
+            .strokeBorder(lineWidth: 3)
+            .aspectRatio(2/3, contentMode: .fill)
+            .frame(width: 45, height: 50)
+            .foregroundStyle(color)
+    }
+
     var addThree: some View {
         Button(action: {
             viewModel.dealThreeCards() //user intent
@@ -148,8 +157,8 @@ struct SetGameView: View {
             }
             .foregroundStyle(viewModel.anyVisibleMatches ? .blue : .red)
         }
-        .disabled(viewModel.cardsInDeck == 0)
-        .opacity(viewModel.cardsInDeck == 0 ? 0.4 : 1)
+        .disabled(viewModel.cardsLeftInDeck == 0)
+        .opacity(viewModel.cardsLeftInDeck == 0 ? 0.4 : 1)
     }
 }
 

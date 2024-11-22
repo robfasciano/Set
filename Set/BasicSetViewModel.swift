@@ -132,7 +132,7 @@ class BasicSetViewModel: ObservableObject {
         return false
     }
 
-    var cardsInDeck: Int {
+    var cardsLeftInDeck: Int {
         model.cardsLeftInDeck
     }
     
