@@ -9,8 +9,9 @@ import Foundation
 
 struct SetGame {
     var cards: Array<Card>
+    var numPlayers: Int
     
-    init() {
+    init(Players numPlayers: Int) {
 //        init(cards: Array<Card>) {
         cards = []
         for localSymbol: cardSymbol in [.Diamond, .Line, .Squiggle] {
@@ -28,6 +29,7 @@ struct SetGame {
             }
         }
         cards.shuffle()
+        self.numPlayers = numPlayers
     }
     
     enum cardSymbol {
@@ -64,13 +66,6 @@ struct SetGame {
         return count
     }
     
-    var faceUpCardCount: Int {
-        var count = 0
-        for i in cards {
-            if i.isDealt && !i.isMatched { count += 1}
-        }
-        return count
-    }
 
     //this are the visibly face up cards, which means we exclude matched ones
     var faceUpCards: Array<Card> {
@@ -252,6 +247,7 @@ struct SetGame {
         }
         var isDealt = false
         var isMatched = false
+        var discardDeck = 0 //make sure to set this when isMatched==true
         var isSelected = false
         let symbol: cardSymbol
         let count: symbolCount

@@ -10,7 +10,7 @@ import SwiftUI
 class BasicSetViewModel: ObservableObject {
     
     private static func createSetGame() -> SetGame {
-        SetGame()
+        SetGame(Players: 2)
     }
     
     @Published private var model = createSetGame()
@@ -141,7 +141,7 @@ class BasicSetViewModel: ObservableObject {
     }
     
     var numPlayers: Int {
-        return 1
+        return model.numPlayers
     }
 
     //MARK: Intents

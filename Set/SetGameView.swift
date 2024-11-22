@@ -12,21 +12,26 @@ struct SetGameView: View {
     @ObservedObject var viewModel: BasicSetViewModel
 
     private let aspectRatio: CGFloat = 2/3
-    
+    @State var activePlayer: Int? = nil
 
     var body: some View {
         VStack {
             HStack{
-                discardPlayer1
+                discardPile(0)
                 cards.animation(.default, value: viewModel.cards)
                 if viewModel.numPlayers == 2 {
-                    discardPlayer2
+                    discardPile(1)
                 }
             }
             Spacer()
             bottomButtons
         }
         .padding()
+        .onAppear() {
+            if viewModel.numPlayers == 1 {
+                activePlayer = 0
+            }
+        }
     }
 
 
@@ -89,25 +94,35 @@ struct SetGameView: View {
         }
     }
     
-    var discardPlayer1: some View {
+    func discardPile(_ player: Int) -> some View {
         VStack {
             ZStack {
-                cardOutline(color: .blue)
+//                highlightDiscard(true)
+                cardOutline(color: .blue, highlight: activePlayer == player)
                 //add discard pile
             }
-            Text("Player 1")
+            Text("Player \(player + 1)").offset(x: 0, y: 20)
+        }
+        .onTapGesture {
+            activePlayer = player
         }
     }
     
-    var discardPlayer2: some View {
+    var discardPlayer1: some View {
         VStack {
             ZStack {
-                cardOutline(color: .blue)
-
+                cardOutline(color: .blue, highlight: activePlayer == 1)
             }
-            Text("Player 2")
+            Text("Player 2").offset(x: 0, y: 20)
         }
+        .onTapGesture {
+            activePlayer = 1
+        }
+
     }
+
+    let myShape = RoundedRectangle(cornerRadius: 9)
+
 
     var deck: some View {
         ZStack {
@@ -120,24 +135,33 @@ struct SetGameView: View {
             }
         }
     
-    let myShape = RoundedRectangle(cornerRadius: 12)
 
-    private func cardShape(color: Color) -> some View {
+    private func cardShape(color: Color, highlight: Bool = false) -> some View {
          myShape
             .aspectRatio(2/3, contentMode: .fill)
             .frame(width: 45, height: 50)
+            .scaleEffect(highlight ? 1.5 : 1)
             .foregroundStyle(color)
     }
     
     
-    private func cardOutline(color: Color) -> some View {
+    private func cardOutline(color: Color, highlight: Bool = false) -> some View {
         return myShape
-            .strokeBorder(lineWidth: 3)
+            .fill(.gray)
             .aspectRatio(2/3, contentMode: .fill)
             .frame(width: 45, height: 50)
-            .foregroundStyle(color)
+            .scaleEffect(highlight ? 1.5 : 1)
+            .overlay(
+                myShape
+                    .strokeBorder(lineWidth: 5)
+                    .foregroundStyle(highlight ? .red : color)
+                    .aspectRatio(2/3, contentMode: .fill)
+                    .frame(width: 45, height: 50)
+                    .scaleEffect(highlight ? 1.5 : 1)
+            )
     }
 
+    
     var addThree: some View {
         Button(action: {
             viewModel.dealThreeCards() //user intent
@@ -161,6 +185,14 @@ struct SetGameView: View {
         .opacity(viewModel.cardsLeftInDeck == 0 ? 0.4 : 1)
     }
 }
+
+//extension Shape {
+//    static func cardFormat(highlight: Bool) -> some View {
+//        .aspectRatio(2/3, contentMode: .fill)
+//        .frame(width: 45, height: 50)
+//        .scaleEffect(highlight ? 1.5 : 1)
+//    }
+//}
 
 #Preview {
     SetGameView(viewModel: BasicSetViewModel())
