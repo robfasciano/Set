@@ -79,10 +79,11 @@ struct SetGameView: View {
                 .font(.largeTitle)
                 .foregroundStyle(viewModel.anyVisibleMatches ? .clear : .red)
             HStack {
-                Text("Players").font(.largeTitle)
-                Stepper("Player", value: $viewModel.numPlayers)
-                    .labelsHidden()
-                    .border(.blue)
+                VStack {
+                    Text("Players").font(.largeTitle)
+                    Stepper ("Player", value: $viewModel.numPlayers, in: 1...4)
+                        .labelsHidden()
+                }
                 Spacer()
                 deck.foregroundStyle(viewModel.cardBack)
                     .onTapGesture {
@@ -114,8 +115,6 @@ struct SetGameView: View {
                     width: Constants.discardDeckHeight * Constants.aspectRatio,
                     height: Constants.discardDeckHeight)
                 .overlay(myShape.fill(.gray))
-                //add discard pile
-                //                CardView(card)
                 .overlay(ForEach (viewModel.cardsInDiscardDeck(player)) { card in
                     CardView(card).foregroundStyle(viewModel.cardBack)})
                 myShape
@@ -141,14 +140,15 @@ struct SetGameView: View {
     
     var deck: some View {
         ZStack {
-            if viewModel.cardsLeftInDeck.count == 0 {
-                cardOutline
-            }
-            ForEach(viewModel.cardsLeftInDeck) { card in
+            myShape.frame(
+                width: Constants.drawDeckHeight * Constants.aspectRatio,
+                height: Constants.drawDeckHeight)
+            .overlay(myShape.fill(.gray))
+            .overlay (ForEach(viewModel.cardsLeftInDeck) { card in
                 CardView(card)
                     .matchedGeometryEffect(id: card.id, in: dealingNamespace)
                     .transition(.asymmetric(insertion: .identity, removal: .identity))
-            }
+            })
             Text("\(viewModel.cardsLeftInDeck.count)")
                 .foregroundStyle(.white).font(.largeTitle)
         }
@@ -157,7 +157,7 @@ struct SetGameView: View {
     }
     
     
-    private var cardOutline: some View {
+    private func cardOutline(height: Int) -> some View {
         return myShape
             .fill(.gray)
             .frame(width: Constants.discardDeckHeight * Constants.aspectRatio,
