@@ -10,17 +10,41 @@ import SwiftUI
 struct SetGameView: View {
     
     @ObservedObject var viewModel: BasicSetViewModel
-
-    private let aspectRatio: CGFloat = 2/3
-    @State var activePlayer: Int? = nil
-
+    
+    private struct Constants {
+        static let aspectRatio: CGFloat = 2/3
+        static let drawDeckHeight: CGFloat = 100
+        static let discardDeckHeight: CGFloat = 150
+        static let discardDeckOpacity: CGFloat = 0.5
+        //        struct FontSize {
+        //            static let largest: CGFloat = 200
+        //            static let smallest: CGFloat = 10
+        //            static let scaleFactor = smallest / largest
+        //        }
+    }
+    
     var body: some View {
         VStack {
             HStack{
-                discardPile(0)
+                VStack {
+                    discardPile(0)
+                    if viewModel.numPlayers > 2 {
+                        Spacer()
+                        discardPile(2)
+                        Spacer()
+                    }
+                }
                 cards.animation(.default, value: viewModel.cards)
-                if viewModel.numPlayers == 2 {
-                    discardPile(1)
+                    .foregroundStyle(viewModel.cardBack)
+                VStack {
+                    if viewModel.numPlayers > 1 {
+                        discardPile(1)
+                    }
+                    if viewModel.numPlayers > 3 {
+                        Spacer()
+                        discardPile(3)
+                        Spacer()
+                    }
                 }
             }
             Spacer()
@@ -28,56 +52,45 @@ struct SetGameView: View {
         }
         .padding()
         .onAppear() {
-            if viewModel.numPlayers == 1 {
-                activePlayer = 0
-            }
+            //            if viewModel.numPlayers == 1 {
+            //                viewModel.activePlayer = 0
+            //            }
         }
     }
-
-
+    
+    
     private var cards: some View {
         let specialColor = viewModel.matchedCards ? viewModel.cardMatchBackground : viewModel.cardMismatchBackground
-        return AspectVGrid(viewModel.faceUpCards, aspectRatio: aspectRatio) { card in
+        return AspectVGrid(viewModel.faceUpCards, aspectRatio: Constants.aspectRatio) { card in
             CardView(card, card.isSelected && viewModel.threeCardsSelected ? specialColor : viewModel.cardBackground)
+                .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+                .transition(.asymmetric(insertion: .identity, removal: .identity))
                 .padding(4)
                 .onTapGesture {
                     viewModel.choose(card)
                 }
         }
     }
-
     
-    struct CardView: View {
-        let card: SetGame.Card
-        let cardBackground: Color
-
-        init(_ card: SetGame.Card, _ cardBackground: Color) {
-            self.card = card
-            self.cardBackground = cardBackground
-        }
-        
-        var body: some View {
-            ZStack{
-                let base = RoundedRectangle(cornerRadius: 12)
-                Group {
-                    base.foregroundStyle(cardBackground)
-                    base.strokeBorder(lineWidth: card.isSelected ? 10 : 3)
-                        .foregroundStyle(.blue)
-                    BasicSetViewModel.show(card, cardBackground)
-                }
-            }
-            .opacity(card.isDealt || !card.isMatched ? 1 : 0)
-
-        }
-    }
     
     var bottomButtons: some View {
-        HStack {
-            addThree
-            Spacer()
-            deck
-            Spacer()
-            newGame
+        VStack {
+            Text("No Matches Possible").multilineTextAlignment(.center)
+                .font(.largeTitle)
+                .foregroundStyle(viewModel.anyVisibleMatches ? .clear : .red)
+            HStack {
+                Text("Players").font(.largeTitle)
+                Stepper("Player", value: $viewModel.numPlayers)
+                    .labelsHidden()
+                    .border(.blue)
+                Spacer()
+                deck.foregroundStyle(viewModel.cardBack)
+                    .onTapGesture {
+                        viewModel.dealThreeCards() //user intent
+                    }
+                Spacer()
+                newGame
+            }
         }
     }
     
@@ -97,102 +110,61 @@ struct SetGameView: View {
     func discardPile(_ player: Int) -> some View {
         VStack {
             ZStack {
-//                highlightDiscard(true)
-                cardOutline(color: .blue, highlight: activePlayer == player)
+                myShape.frame(
+                    width: Constants.discardDeckHeight * Constants.aspectRatio,
+                    height: Constants.discardDeckHeight)
+                .overlay(myShape.fill(.gray))
                 //add discard pile
+                //                CardView(card)
+                .overlay(ForEach (viewModel.cardsInDiscardDeck(player)) { card in
+                    CardView(card).foregroundStyle(viewModel.cardBack)})
+                myShape
+                    .fill(viewModel.activePlayer == player ? .red : .clear)
+                    .opacity(viewModel.cardsInDiscardDeck(player).isEmpty ? 1.0 : Constants.discardDeckOpacity)
+                    .frame(
+                        width: Constants.discardDeckHeight * Constants.aspectRatio,
+                        height: Constants.discardDeckHeight)
+                
             }
             Text("Player \(player + 1)").offset(x: 0, y: 20)
+            Text("Score: \(viewModel.score(player))").offset(x: 0, y: 20)
         }
         .onTapGesture {
-            activePlayer = player
+            viewModel.activePlayer = player
         }
     }
     
-    var discardPlayer1: some View {
-        VStack {
-            ZStack {
-                cardOutline(color: .blue, highlight: activePlayer == 1)
-            }
-            Text("Player 2").offset(x: 0, y: 20)
-        }
-        .onTapGesture {
-            activePlayer = 1
-        }
-
-    }
-
+    
     let myShape = RoundedRectangle(cornerRadius: 9)
-
-
+    
+    @Namespace private var dealingNamespace
+    
     var deck: some View {
         ZStack {
-            if viewModel.cardsLeftInDeck == 0 {
-                cardOutline(color: .blue)
+            if viewModel.cardsLeftInDeck.count == 0 {
+                cardOutline
             }
-            cardShape(color: .blue)
-            Text("\(viewModel.cardsLeftInDeck)")
-                    .foregroundStyle(.white).font(.largeTitle)
+            ForEach(viewModel.cardsLeftInDeck) { card in
+                CardView(card)
+                    .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+                    .transition(.asymmetric(insertion: .identity, removal: .identity))
             }
+            Text("\(viewModel.cardsLeftInDeck.count)")
+                .foregroundStyle(.white).font(.largeTitle)
         }
-    
-
-    private func cardShape(color: Color, highlight: Bool = false) -> some View {
-         myShape
-            .aspectRatio(2/3, contentMode: .fill)
-            .frame(width: 45, height: 50)
-            .scaleEffect(highlight ? 1.5 : 1)
-            .foregroundStyle(color)
+        .frame(width: Constants.drawDeckHeight * Constants.aspectRatio,
+               height: Constants.drawDeckHeight)
     }
     
     
-    private func cardOutline(color: Color, highlight: Bool = false) -> some View {
+    private var cardOutline: some View {
         return myShape
             .fill(.gray)
-            .aspectRatio(2/3, contentMode: .fill)
-            .frame(width: 45, height: 50)
-            .scaleEffect(highlight ? 1.5 : 1)
-            .overlay(
-                myShape
-                    .strokeBorder(lineWidth: 5)
-                    .foregroundStyle(highlight ? .red : color)
-                    .aspectRatio(2/3, contentMode: .fill)
-                    .frame(width: 45, height: 50)
-                    .scaleEffect(highlight ? 1.5 : 1)
-            )
+            .frame(width: Constants.discardDeckHeight * Constants.aspectRatio,
+                   height: Constants.discardDeckHeight)
     }
-
     
-    var addThree: some View {
-        Button(action: {
-            viewModel.dealThreeCards() //user intent
-        })
-        {
-            VStack{
-                if viewModel.anyVisibleMatches {
-                    Image(systemName: "rectangle.stack.badge.plus")
-                        .font(.largeTitle)
-                        .symbolEffect(.wiggle.left.byLayer, options: .repeat(.periodic(delay: 5.0))) //delay deoes not seem to be updateable by a change in the viewModel (unlike foreground color)
-                } else {
-                    Image(systemName: "rectangle.stack.badge.plus")
-                        .font(.largeTitle)
-                        .symbolEffect(.wiggle.left.byLayer, options: .repeat(.periodic(delay: 0.0))) //delay deoes not seem to be updateable by a change in the viewModel (unlike foreground color)
-                }
-                Text("Add 3")
-            }
-            .foregroundStyle(viewModel.anyVisibleMatches ? .blue : .red)
-        }
-        .disabled(viewModel.cardsLeftInDeck == 0)
-        .opacity(viewModel.cardsLeftInDeck == 0 ? 0.4 : 1)
-    }
 }
-
-//extension Shape {
-//    static func cardFormat(highlight: Bool) -> some View {
-//        .aspectRatio(2/3, contentMode: .fill)
-//        .frame(width: 45, height: 50)
-//        .scaleEffect(highlight ? 1.5 : 1)
-//    }
-//}
 
 #Preview {
     SetGameView(viewModel: BasicSetViewModel())

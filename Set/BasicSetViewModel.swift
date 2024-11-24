@@ -9,112 +9,24 @@ import SwiftUI
 
 class BasicSetViewModel: ObservableObject {
     
-    private static func createSetGame() -> SetGame {
-        SetGame(Players: 2)
+    private static func createSetGame(_ players: Int) -> SetGame {
+        SetGame(Players: players)
     }
+
+    let cardBackground: Color = .white
+    let cardMatchBackground: Color = Color(red: 0.826, green: 1.00, blue: 0.870) //light green
+    let cardMismatchBackground: Color = Color(red: 1.0, green: 0.909, blue: 0.926) //light red
+    let cardBack: Color = Color(red: 0.384, green: 0.2, blue: 1.00) //light purple
+
     
-    @Published private var model = createSetGame()
+    @Published private var model = createSetGame(1)
     
     var faceUpCards: Array<SetGame.Card> {
         return model.faceUpCards
     }
     
-    let cardBackground: Color = .white
-    let cardMatchBackground: Color = Color(red: 0.826, green: 1.00, blue: 0.870) //light green
-    let cardMismatchBackground: Color = Color(red: 1.0, green: 0.909, blue: 0.926) //light red
+    @Published var activePlayer: Int? = nil
 
-
-    struct show:View {
-        let card: SetGame.Card
-        let backColor: Color
-
-        init(_ card: SetGame.Card, _ backColor: Color) {
-            self.card = card
-            self.backColor = backColor
-        }
-        var body: some View {
-            VStack {
-                switch card.count { //leaving as enums.  Maybe I will want .one to be 4?
-                case .one:
-                    oneShape(card, backColor)
-                case .two:
-                    oneShape(card, backColor)
-                    oneShape(card, backColor)
-                case .three:
-                    oneShape(card, backColor)
-                    oneShape(card, backColor)
-                    oneShape(card, backColor)
-                }
-            }
-            .padding(15)
-        }
-        
-        
-        struct oneShape: View {
-            let card: SetGame.Card
-            let backColor: Color
-            
-            init(_ card: SetGame.Card, _ backColor: Color) {
-                self.card = card
-                self.backColor = backColor
-            }
-            
-            var body: some View {
-                switch card.symbol {
-                case .Diamond:
-                    Diamond().fill(LinearGradient(colors: pattern(card, backColor),
-                                        startPoint: UnitPoint(x: 0, y: 0),
-                                        endPoint: UnitPoint(x: 1, y: 0)))
-                    .stroke(color(card), lineWidth: 4)
-                    .aspectRatio(3.0, contentMode: .fit)
-                    
-                case .Squiggle:
-                    Squiggle().fill(
-                        LinearGradient(colors: pattern(card, backColor),
-                                       startPoint: UnitPoint(x: 0, y: 1.5),
-                                       endPoint: UnitPoint(x: 1, y: 0)))
-                    .stroke(color(card), lineWidth: 4)
-                    .rotationEffect(Angle(degrees: 25))
-                    .aspectRatio(3.0, contentMode: .fit)
-                case .Line:
-                    RoundedRectangle(cornerRadius: 50).fill(LinearGradient(colors: pattern(card, backColor),
-                                        startPoint: UnitPoint(x: 0, y: 0),
-                                        endPoint: UnitPoint(x: 1, y: 0)))
-                    .stroke(color(card), lineWidth: 4)
-                    .aspectRatio(3.0, contentMode: .fit)
-                }
-            }
-            
-            
-            func pattern(_ which: SetGame.Card, _ backColor: Color) -> [Color] {
-                switch which.shading {
-                case .open:
-                    return [backColor]
-                case .striped:
-                    var colorArray = [color(card)]
-                    for _ in 1...20 {
-                        colorArray.append(backColor)
-                        colorArray.append(color(card))
-                    }
-                    return colorArray
-                case .filled:
-                    return [color(card)]
-                }
-            }
-            
-            func color(_ which: SetGame.Card) -> Color {
-                switch which.color {
-                case .color1:
-                    return .red
-                case .color2:
-                    return .green
-                case .color3:
-                    return .purple
-                }
-            }
-        }
-    }
-    
     var cards: Array<SetGame.Card> {
         return model.cards
     }
@@ -132,8 +44,12 @@ class BasicSetViewModel: ObservableObject {
         return false
     }
 
-    var cardsLeftInDeck: Int {
+    var cardsLeftInDeck: Array<SetGame.Card> {
         model.cardsLeftInDeck
+    }
+ 
+    func cardsInDiscardDeck(_ which: Int) -> Array<SetGame.Card> {
+        model.cardsInDiscardDeck(which)
     }
     
     var threeCardsSelected: Bool {
@@ -141,27 +57,61 @@ class BasicSetViewModel: ObservableObject {
     }
     
     var numPlayers: Int {
-        return model.numPlayers
+        get { model.numPlayers }
+        set {
+            model.numPlayers = newValue
+            model = BasicSetViewModel.createSetGame(newValue)
+        }
     }
+    
+    func score(_ player: Int) -> Int {
+        model.score(player: player)
+    }
+
+    
+    private let dealAnimation: Animation = .easeInOut(duration: 0.15)
+    private let dealInterval: TimeInterval = 0.15
 
     //MARK: Intents
     func dealThreeCards() {
-        if model.numberOfSelectedCards == 3 {
-            if model.matchedSetSelected() {
-                model.removeMatch()
-                model.deselectAll()
+        var delay: TimeInterval = 0
+
+//        if model.numberOfSelectedCards == 3 {
+//            if model.matchedSetSelected() {
+//                withAnimation(dealAnimation.delay(delay)) {
+//                    model.removeMatch(player: activePlayer!)
+//                }
+//                model.deselectAll()
+//            }
+//            delay += dealInterval
+//        }
+
+        for _ in 1...3 {
+            withAnimation(dealAnimation.delay(delay)) {
+                model.deal(1)
             }
+            delay += dealInterval
         }
-        model.deal(3)
-     }
+    }
     
     func newGame() {
-        model = BasicSetViewModel.createSetGame()
-        model.deal(12)
+        var delay: TimeInterval = 0
+        activePlayer = nil
+        
+        model = BasicSetViewModel.createSetGame(numPlayers)
+        for _ in 1...12 {
+            withAnimation(dealAnimation.delay(delay)) {
+                model.deal(1)
+            }
+            delay += dealInterval
+        }
     }
 
     func choose(_ card: SetGame.Card) {
-        model.chooseCard(card)
+        if activePlayer == nil { return }
+        if model.chooseCard(card, player: activePlayer!) {
+            activePlayer = nil
+        }
     }
 
 }

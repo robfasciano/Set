@@ -11,6 +11,8 @@ struct SetGame {
     var cards: Array<Card>
     var numPlayers: Int
     
+    private var score: Array<Int>
+    
     init(Players numPlayers: Int) {
 //        init(cards: Array<Card>) {
         cards = []
@@ -30,6 +32,10 @@ struct SetGame {
         }
         cards.shuffle()
         self.numPlayers = numPlayers
+        self.score = []
+        for _ in 1...numPlayers {
+            self.score.append(0)
+        }
     }
     
     enum cardSymbol {
@@ -56,16 +62,30 @@ struct SetGame {
         case color3
     }
     
-    var cardsLeftInDeck: Int {
-        var count = 0
-        for i in cards {
-            if !i.isDealt {
-                count += 1
-            }
-        }
-        return count
+    func score(player: Int) -> Int {
+        score[player]
     }
     
+    var cardsLeftInDeck: Array<Card> {
+        var tempCards:Array<Card> = []
+        for i in cards {
+            if !i.isDealt {
+                tempCards.append(i)
+            }
+        }
+        return tempCards
+    }
+   
+    func cardsInDiscardDeck(_ which: Int) -> Array<Card> {
+        var tempCards:Array<Card> = []
+        for i in cards {
+            if i.isMatched && i.discardDeck == which {
+                tempCards.append(i)
+            }
+        }
+        return tempCards
+    }
+
 
     //this are the visibly face up cards, which means we exclude matched ones
     var faceUpCards: Array<Card> {
@@ -93,22 +113,43 @@ struct SetGame {
     }
     
     
-    mutating func chooseCard(_ card: Card) {
-        if numberOfSelectedCards < 3 {
-            cards[indexOfChosen(card)].isSelected.toggle()
-        } else {
+//    mutating func chooseCard(_ card: Card, player: Int) {
+//        if numberOfSelectedCards < 3 {
+//            cards[indexOfChosen(card)].isSelected.toggle()
+//        } else {
+//            if matchedSetSelected() {
+//                removeMatch(player: player)
+//                deal(3)
+//            }
+//            deselectAll()
+//            if !cards[indexOfChosen(card)].isMatched {
+//                cards[indexOfChosen(card)].isSelected = true
+//            }
+//        }
+//    }
+    
+  
+    mutating func chooseCard(_ card: Card, player: Int) -> Bool {
+        var deselectPlayer = false
+        
+        cards[indexOfChosen(card)].isSelected.toggle()
+        if numberOfSelectedCards == 3 {
+            deselectPlayer = true
             if matchedSetSelected() {
-                removeMatch()
+                //show animation for good match
+                removeMatch(player: player)
+                score[player] += 1
                 deal(3)
+            } else {
+                //show animation for bad match
+                score[player] -= 1
             }
             deselectAll()
-            if !cards[indexOfChosen(card)].isMatched {
-                cards[indexOfChosen(card)].isSelected = true
-            }
         }
+       return deselectPlayer
     }
     
-    
+
     mutating func deselectAll() {
         for i in cards.indices {
             cards[i].isSelected = false
@@ -217,10 +258,11 @@ struct SetGame {
         return false
     }
     
-    mutating func removeMatch() {
+    mutating func removeMatch(player: Int) {
         for i in cards.indices {
             if cards[i].isSelected {
                 cards[i].isMatched = true
+                cards[i].discardDeck = player
                 cards[i].isSelected = false
             }
         }
