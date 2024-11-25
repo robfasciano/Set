@@ -125,12 +125,13 @@ struct SetGameView: View {
                         height: Constants.discardDeckHeight)
                 
             }
-            Text("Player \(player + 1)").offset(x: 0, y: 20)
-            Text("Score: \(viewModel.score(player))").offset(x: 0, y: 20)
+            Text("Player \(player + 1)").font(.title)
+            Text("\(viewModel.score(player))").font(.largeTitle).fontWeight(.black)
         }
         .onTapGesture {
             viewModel.activePlayer = player
         }
+        .disabled(viewModel.activePlayer != nil)
     }
     
     

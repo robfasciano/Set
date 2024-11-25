@@ -60,7 +60,8 @@ class BasicSetViewModel: ObservableObject {
         get { model.numPlayers }
         set {
             model.numPlayers = newValue
-            newGame()
+            activePlayer = nil
+            model = BasicSetViewModel.createSetGame(numPlayers)
         }
     }
     

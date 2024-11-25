@@ -11,6 +11,8 @@ struct SetGame {
     var cards: Array<Card>
     var numPlayers: Int
     
+    let replaceMatchedCards = false
+    
     private var score: Array<Int>
     
     init(Players numPlayers: Int) {
@@ -113,22 +115,6 @@ struct SetGame {
     }
     
     
-//    mutating func chooseCard(_ card: Card, player: Int) {
-//        if numberOfSelectedCards < 3 {
-//            cards[indexOfChosen(card)].isSelected.toggle()
-//        } else {
-//            if matchedSetSelected() {
-//                removeMatch(player: player)
-//                deal(3)
-//            }
-//            deselectAll()
-//            if !cards[indexOfChosen(card)].isMatched {
-//                cards[indexOfChosen(card)].isSelected = true
-//            }
-//        }
-//    }
-    
-  
     mutating func chooseCard(_ card: Card, player: Int) -> Bool {
         var deselectPlayer = false
         
@@ -139,7 +125,9 @@ struct SetGame {
                 //show animation for good match
                 removeMatch(player: player)
                 score[player] += 1
-                deal(3)
+                if replaceMatchedCards {
+                    deal(3)
+                }
             } else {
                 //show animation for bad match
                 score[player] -= 1
