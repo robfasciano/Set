@@ -23,6 +23,8 @@ struct SetGameView: View {
         //        }
     }
     
+    let myShape = RoundedRectangle(cornerRadius: 9)
+
     var body: some View {
         VStack {
             HStack{
@@ -117,25 +119,36 @@ struct SetGameView: View {
                 .overlay(myShape.fill(.gray))
                 .overlay(ForEach (viewModel.cardsInDiscardDeck(player)) { card in
                     CardView(card).foregroundStyle(viewModel.cardBack)})
-                myShape
-                    .fill(viewModel.activePlayer == player ? .red : .clear)
-                    .opacity(viewModel.cardsInDiscardDeck(player).isEmpty ? 1.0 : Constants.discardDeckOpacity)
-                    .frame(
-                        width: Constants.discardDeckHeight * Constants.aspectRatio,
-                        height: Constants.discardDeckHeight)
-                
+                countdown(player)
             }
+
             Text("Player \(player + 1)").font(.title)
-            Text("\(viewModel.score(player))").font(.largeTitle).fontWeight(.black)
+            Text("\(viewModel.score(player))").font(.largeTitle).fontWeight(.heavy)
         }
         .onTapGesture {
             viewModel.activePlayer = player
         }
         .disabled(viewModel.activePlayer != nil)
     }
-    
-    
-    let myShape = RoundedRectangle(cornerRadius: 9)
+
+    //TODO: this is not perfectly indicating time left due to padding(?)
+    func countdown(_ player: Int) -> some View {
+        let percentLeft = 10.0
+        
+        return VStack {
+            myShape
+                .fill(.clear)
+                .frame(
+                    width: Constants.discardDeckHeight * Constants.aspectRatio,
+                    height: Constants.discardDeckHeight * (1 - percentLeft / 100.0))
+            myShape
+                .fill(viewModel.activePlayer == player ? .red : .clear)
+                .opacity(viewModel.cardsInDiscardDeck(player).isEmpty ? 1.0 : Constants.discardDeckOpacity)
+                .frame(
+                    width: Constants.discardDeckHeight * Constants.aspectRatio,
+                    height: Constants.discardDeckHeight * (percentLeft / 100.0))
+        }
+    }
     
     @Namespace private var dealingNamespace
     
@@ -157,13 +170,6 @@ struct SetGameView: View {
                height: Constants.drawDeckHeight)
     }
     
-    
-    private func cardOutline(height: Int) -> some View {
-        return myShape
-            .fill(.gray)
-            .frame(width: Constants.discardDeckHeight * Constants.aspectRatio,
-                   height: Constants.discardDeckHeight)
-    }
     
 }
 
