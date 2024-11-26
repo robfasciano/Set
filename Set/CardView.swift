@@ -25,22 +25,7 @@ struct CardView: View {
                     .transition(.scale) //.opacity is default transition
         }
     }
-    
-    var timerStart: Date?
-    //TODO: need to set this variable when player calls "Set"
-
-    var timerPercentRemaining: Double {
-        timeLeft > 0 ? (timeLeft / Constants.timeToChoose ) * 100.0  : 0.0
-    }
-
-    var timeLeft: TimeInterval {
-        if let timerStart {
-            return Date().timeIntervalSince(timerStart)
-        } else {
-            return Constants.timeToChoose
-        }
-    }
-    
+        
     var cardContents: some View {
         VStack {
             switch card.count { //leaving as enums.  Maybe I will want .one to be 4 shapes? or 7?
@@ -127,7 +112,6 @@ private struct Constants {
     static let shapeAspect = 3.0
     static let border = 4
     static let numStripes = 20
-    static let timeToChoose = 5.0
 
 
 //    struct FontSize {

@@ -119,34 +119,39 @@ struct SetGameView: View {
                 .overlay(myShape.fill(.gray))
                 .overlay(ForEach (viewModel.cardsInDiscardDeck(player)) { card in
                     CardView(card).foregroundStyle(viewModel.cardBack)})
-                countdown(player)
+                if viewModel.activePlayer == player {
+                    countdown(player)
+                        .onDisappear(perform: {
+                            viewModel.setActive(nil)
+                        })
+                }
             }
 
             Text("Player \(player + 1)").font(.title)
             Text("\(viewModel.score(player))").font(.largeTitle).fontWeight(.heavy)
         }
         .onTapGesture {
-            viewModel.activePlayer = player
+            viewModel.setActive(player)
         }
         .disabled(viewModel.activePlayer != nil)
     }
 
     //TODO: this is not perfectly indicating time left due to padding(?)
     func countdown(_ player: Int) -> some View {
-        let percentLeft = 10.0
-        
-        return VStack {
-            myShape
-                .fill(.clear)
-                .frame(
-                    width: Constants.discardDeckHeight * Constants.aspectRatio,
-                    height: Constants.discardDeckHeight * (1 - percentLeft / 100.0))
-            myShape
-                .fill(viewModel.activePlayer == player ? .red : .clear)
-                .opacity(viewModel.cardsInDiscardDeck(player).isEmpty ? 1.0 : Constants.discardDeckOpacity)
-                .frame(
-                    width: Constants.discardDeckHeight * Constants.aspectRatio,
-                    height: Constants.discardDeckHeight * (percentLeft / 100.0))
+        return VStack(spacing: 0) {
+            TimelineView(.animation(minimumInterval: 1/15)) { timeline in
+                myShape
+                    .fill(.clear)
+                    .frame(
+                        width: Constants.discardDeckHeight * Constants.aspectRatio,
+                        height: Constants.discardDeckHeight * (1 - viewModel.timerPercentRemaining / 100.0))
+                myShape
+                    .fill(viewModel.activePlayer == player ? .red : .clear)
+                    .opacity(viewModel.cardsInDiscardDeck(player).isEmpty ? 1.0 : Constants.discardDeckOpacity)
+                    .frame(
+                        width: Constants.discardDeckHeight * Constants.aspectRatio,
+                        height: Constants.discardDeckHeight * (viewModel.timerPercentRemaining / 100.0))
+            }
         }
     }
     

@@ -15,8 +15,11 @@ struct SetGame {
     
     private var score: Array<Int>
     
+    var activePlayer: Int? = nil
+
+    
     init(Players numPlayers: Int) {
-//        init(cards: Array<Card>) {
+        //        init(cards: Array<Card>) {
         cards = []
         for localSymbol: cardSymbol in [.Diamond, .Line, .Squiggle] {
             for localCount: symbolCount in [.one, .two, .three] {
@@ -77,7 +80,7 @@ struct SetGame {
         }
         return tempCards
     }
-   
+    
     func cardsInDiscardDeck(_ which: Int) -> Array<Card> {
         var tempCards:Array<Card> = []
         for i in cards {
@@ -87,8 +90,8 @@ struct SetGame {
         }
         return tempCards
     }
-
-
+    
+    
     //this are the visibly face up cards, which means we exclude matched ones
     var faceUpCards: Array<Card> {
         var tempCards:Array<Card> = []
@@ -99,7 +102,7 @@ struct SetGame {
         }
         return tempCards
     }
-
+    
     
     mutating func deal(_ toDeal: Int) {
         var dealCount = 0
@@ -134,10 +137,10 @@ struct SetGame {
             }
             deselectAll()
         }
-       return deselectPlayer
+        return deselectPlayer
     }
     
-
+    
     mutating func deselectAll() {
         for i in cards.indices {
             cards[i].isSelected = false
@@ -168,8 +171,8 @@ struct SetGame {
     func matchedSetSelected() -> Bool {
         threeCardsMatch(getSelectedCards())
     }
-
-
+    
+    
     func colorSet(_ cardsSelected: [Card]) -> Bool {
         if cardsSelected[0].color == cardsSelected[1].color
             && cardsSelected[0].color == cardsSelected[2].color {
@@ -182,7 +185,7 @@ struct SetGame {
         }
         return false
     }
-
+    
     func symbolSet(_ cardsSelected: [Card]) -> Bool {
         if cardsSelected[0].symbol == cardsSelected[1].symbol
             && cardsSelected[0].symbol == cardsSelected[2].symbol {
@@ -195,7 +198,7 @@ struct SetGame {
         }
         return false
     }
-
+    
     func shadingSet(_ cardsSelected: [Card]) -> Bool {
         if cardsSelected[0].shading == cardsSelected[1].shading
             && cardsSelected[0].shading == cardsSelected[2].shading {
@@ -208,7 +211,7 @@ struct SetGame {
         }
         return false
     }
-
+    
     func numberSet(_ cardsSelected: [Card]) -> Bool {
         if cardsSelected[0].count == cardsSelected[1].count
             && cardsSelected[0].count == cardsSelected[2].count {
@@ -221,7 +224,7 @@ struct SetGame {
         }
         return false
     }
-
+    
     func getSelectedCards() -> [Card] {
         var returnVal: Array<Card> = []
         for i in cards {
@@ -254,7 +257,7 @@ struct SetGame {
                 cards[i].isSelected = false
             }
         }
-
+        
     }
     
     func indexOfChosen(_ card: Card) -> Int {
@@ -269,7 +272,31 @@ struct SetGame {
         return 0 //FIXME: this should really handle error here
     }
     
+    var timerStart: Date?
+    //TODO: need to set this variable when player calls "Set"
     
+    var timerPercentRemaining: Double {
+        timeLeft > 0 ? (timeLeft / Constants.timeToChoose ) * 100.0  : 0.0
+    }
+    
+//    var timerPercentRemaining: Double {
+//        mutating get {
+//            if timeLeft < 0 {
+//                score[activePlayer!] -= 1
+//                activePlayer = nil
+//            }
+//            return timeLeft > 0 ? (timeLeft / Constants.timeToChoose ) * 100.0  : 0.0
+//        }
+//    }
+
+    var timeLeft: TimeInterval {
+        if let timerStart {
+            return Constants.timeToChoose - Date().timeIntervalSince(timerStart)
+        } else {
+            return Constants.timeToChoose
+        }
+    }
+
     
     struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
         var debugDescription: String {
@@ -326,8 +353,13 @@ struct SetGame {
             case .Line:
                 tempString.append("⎯")
             }
-
+            
             return tempString
         }
     }
+    
+    private struct Constants {
+        static let timeToChoose = 5.0
+    }
+    
 }

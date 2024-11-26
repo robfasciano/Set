@@ -25,8 +25,19 @@ class BasicSetViewModel: ObservableObject {
         return model.faceUpCards
     }
     
-    @Published var activePlayer: Int? = nil
-
+    var activePlayer: Int? {
+        model.activePlayer
+    }
+    
+    func setActive(_ player: Int) {
+        model.activePlayer = player
+        model.timerStart = Date()
+    }
+    
+    var timerPercentRemaining: CGFloat {
+        model.timerPercentRemaining
+    }
+    
     var cards: Array<SetGame.Card> {
         return model.cards
     }
@@ -60,7 +71,7 @@ class BasicSetViewModel: ObservableObject {
         get { model.numPlayers }
         set {
             model.numPlayers = newValue
-            activePlayer = nil
+            model.activePlayer = nil
             model = BasicSetViewModel.createSetGame(numPlayers)
         }
     }
@@ -68,7 +79,6 @@ class BasicSetViewModel: ObservableObject {
     func score(_ player: Int) -> Int {
         model.score(player: player)
     }
-
     
     private let dealAnimation: Animation = .easeInOut(duration: 0.15)
     private let dealInterval: TimeInterval = 0.15
@@ -76,17 +86,6 @@ class BasicSetViewModel: ObservableObject {
     //MARK: Intents
     func dealThreeCards() {
         var delay: TimeInterval = 0
-
-//        if model.numberOfSelectedCards == 3 {
-//            if model.matchedSetSelected() {
-//                withAnimation(dealAnimation.delay(delay)) {
-//                    model.removeMatch(player: activePlayer!)
-//                }
-//                model.deselectAll()
-//            }
-//            delay += dealInterval
-//        }
-
         for _ in 1...3 {
             withAnimation(dealAnimation.delay(delay)) {
                 model.deal(1)
@@ -97,7 +96,7 @@ class BasicSetViewModel: ObservableObject {
     
     func newGame() {
         var delay: TimeInterval = 0
-        activePlayer = nil
+        model.activePlayer = nil
         
         model = BasicSetViewModel.createSetGame(numPlayers)
         for _ in 1...12 {
@@ -109,9 +108,9 @@ class BasicSetViewModel: ObservableObject {
     }
 
     func choose(_ card: SetGame.Card) {
-        if activePlayer == nil { return }
-        if model.chooseCard(card, player: activePlayer!) {
-            activePlayer = nil
+        if model.activePlayer == nil { return }
+        if model.chooseCard(card, player: model.activePlayer!) {
+            model.activePlayer = nil
         }
     }
 
