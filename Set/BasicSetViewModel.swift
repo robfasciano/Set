@@ -34,8 +34,19 @@ class BasicSetViewModel: ObservableObject {
         model.timerStart = Date()
     }
     
+    func timerDone() {
+        model.addScore(model.activePlayer!, points: -1)
+        model.deselectAll()
+        model.activePlayer = nil
+    }
+
     var timerPercentRemaining: CGFloat {
-        model.timerPercentRemaining
+        get {
+            if model.timerPercentRemaining <= 0 && model.activePlayer != nil {
+                timerDone()
+            }
+            return model.timerPercentRemaining
+        }
     }
     
     var cards: Array<SetGame.Card> {
@@ -80,31 +91,17 @@ class BasicSetViewModel: ObservableObject {
         model.score(player: player)
     }
     
-    private let dealAnimation: Animation = .easeInOut(duration: 0.15)
-    private let dealInterval: TimeInterval = 0.15
+    private let dealInterval: TimeInterval = 0.5
 
     //MARK: Intents
-    func dealThreeCards() {
-        var delay: TimeInterval = 0
-        for _ in 1...3 {
-            withAnimation(dealAnimation.delay(delay)) {
-                model.deal(1)
-            }
-            delay += dealInterval
-        }
+    func dealCards(_ numberOfCards: Int) {
+        model.deal(numberOfCards)
     }
     
     func newGame() {
-        var delay: TimeInterval = 0
         model.activePlayer = nil
         
         model = BasicSetViewModel.createSetGame(numPlayers)
-        for _ in 1...12 {
-            withAnimation(dealAnimation.delay(delay)) {
-                model.deal(1)
-            }
-            delay += dealInterval
-        }
     }
 
     func choose(_ card: SetGame.Card) {

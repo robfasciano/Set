@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import SwiftUICore
 
 struct SetGame {
     var cards: Array<Card>
@@ -69,6 +70,10 @@ struct SetGame {
     
     func score(player: Int) -> Int {
         score[player]
+    }
+    
+    mutating func addScore(_ player: Int, points: Int) {
+        score[player] += points
     }
     
     var cardsLeftInDeck: Array<Card> {
@@ -271,23 +276,13 @@ struct SetGame {
         }
         return 0 //FIXME: this should really handle error here
     }
-    
+
+    //MARK: timer funcs
     var timerStart: Date?
-    //TODO: need to set this variable when player calls "Set"
-    
+
     var timerPercentRemaining: Double {
         timeLeft > 0 ? (timeLeft / Constants.timeToChoose ) * 100.0  : 0.0
     }
-    
-//    var timerPercentRemaining: Double {
-//        mutating get {
-//            if timeLeft < 0 {
-//                score[activePlayer!] -= 1
-//                activePlayer = nil
-//            }
-//            return timeLeft > 0 ? (timeLeft / Constants.timeToChoose ) * 100.0  : 0.0
-//        }
-//    }
 
     var timeLeft: TimeInterval {
         if let timerStart {
@@ -359,7 +354,7 @@ struct SetGame {
     }
     
     private struct Constants {
-        static let timeToChoose = 5.0
+        static let timeToChoose = 6.0
     }
     
 }

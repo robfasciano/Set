@@ -28,49 +28,48 @@ struct SetGameView: View {
     var body: some View {
         VStack {
             HStack{
-                VStack {
-                    discardPile(0)
-                    if viewModel.numPlayers > 2 {
-                        Spacer()
-                        discardPile(2)
-                        Spacer()
-                    }
-                }
+                discardColumn(topPlayer: 0)
                 cards.animation(.default, value: viewModel.cards)
                     .foregroundStyle(viewModel.cardBack)
-                VStack {
-                    if viewModel.numPlayers > 1 {
-                        discardPile(1)
-                    }
-                    if viewModel.numPlayers > 3 {
-                        Spacer()
-                        discardPile(3)
-                        Spacer()
-                    }
-                }
+                discardColumn(topPlayer: 1)
             }
             Spacer()
             bottomButtons
         }
         .padding()
-        .onAppear() {
-            //            if viewModel.numPlayers == 1 {
-            //                viewModel.activePlayer = 0
-            //            }
-        }
     }
     
+    func discardColumn(topPlayer: Int) -> some View {
+        VStack {
+            if viewModel.numPlayers > topPlayer {
+                Spacer()
+                discardPile(topPlayer)
+                Spacer()
+            }
+            if viewModel.numPlayers > topPlayer + 2 {
+                discardPile(topPlayer + 2)
+                Spacer()
+            }
+            if viewModel.numPlayers > topPlayer + 4 {
+                discardPile(topPlayer + 4)
+                Spacer()
+            }
+        }
+
+    }
     
     private var cards: some View {
         let specialColor = viewModel.matchedCards ? viewModel.cardMatchBackground : viewModel.cardMismatchBackground
         return AspectVGrid(viewModel.faceUpCards, aspectRatio: Constants.aspectRatio) { card in
-            CardView(card, card.isSelected && viewModel.threeCardsSelected ? specialColor : viewModel.cardBackground)
-                .matchedGeometryEffect(id: card.id, in: dealingNamespace)
-                .transition(.asymmetric(insertion: .identity, removal: .identity))
-                .padding(4)
-                .onTapGesture {
-                    viewModel.choose(card)
-                }
+            if isDealt(card) && !isDiscarded(card) {
+                CardView(card, card.isSelected && viewModel.threeCardsSelected ? specialColor : viewModel.cardBackground)
+                    .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+                    .transition(.asymmetric(insertion: .identity, removal: .identity))
+                    .padding(4)
+                    .onTapGesture {
+                        viewModel.choose(card)
+                    }
+            }
         }
     }
     
@@ -78,28 +77,58 @@ struct SetGameView: View {
     var bottomButtons: some View {
         VStack {
             Text("No Matches Possible").multilineTextAlignment(.center)
-                .font(.largeTitle)
+                .font(.largeTitle).fontWeight(.heavy)
                 .foregroundStyle(viewModel.anyVisibleMatches ? .clear : .red)
             HStack {
                 VStack {
                     Text("Players").font(.largeTitle)
-                    Stepper ("Player", value: $viewModel.numPlayers, in: 1...4)
+                    Stepper ("Player", value: $viewModel.numPlayers, in: 1...6)
                         .labelsHidden()
                 }
                 Spacer()
-                deck.foregroundStyle(viewModel.cardBack)
+                deck
                     .onTapGesture {
-                        viewModel.dealThreeCards() //user intent
+                        viewModel.dealCards(3) //user intent
+                        updateDealtCards()
                     }
+                
                 Spacer()
                 newGame
             }
         }
     }
     
+    private let dealAnimation: Animation = .easeIn(duration: 0.40)
+    //        private let dealAnimation: Animation = .default
+    private let dealInterval: TimeInterval = 0.15
+    
+    func updateDealtCards() {
+        var delay: TimeInterval = 0
+        for card in viewModel.faceUpCards {
+            if !dealt.contains(card.id) {
+                withAnimation(dealAnimation.delay(delay)) {
+                    dealt.append(card.id)
+                }
+                delay += dealInterval
+            }
+        }
+    }
+    
+    func clearBoard() {
+        withAnimation(dealAnimation) {
+            dealt = []
+            discarded = []
+        }
+    }
+
+    
     var newGame: some View {
         Button(action: {
             viewModel.newGame() //user intent
+            clearBoard()
+            viewModel.dealCards(12)
+            updateDealtCards()
+
         })
         {
             VStack{
@@ -121,9 +150,6 @@ struct SetGameView: View {
                     CardView(card).foregroundStyle(viewModel.cardBack)})
                 if viewModel.activePlayer == player {
                     countdown(player)
-                        .onDisappear(perform: {
-                            viewModel.setActive(nil)
-                        })
                 }
             }
 
@@ -136,10 +162,11 @@ struct SetGameView: View {
         .disabled(viewModel.activePlayer != nil)
     }
 
-    //TODO: this is not perfectly indicating time left due to padding(?)
+
     func countdown(_ player: Int) -> some View {
-        return VStack(spacing: 0) {
-            TimelineView(.animation(minimumInterval: 1/15)) { timeline in
+        // >= 1/15 is smooth, 1 is 'click'-like
+        return TimelineView(.animation(minimumInterval: 1/15)) { timeline in
+            VStack(spacing: 0) { //must be inside TimelineView to keep spacing = 0
                 myShape
                     .fill(.clear)
                     .frame(
@@ -156,13 +183,24 @@ struct SetGameView: View {
     }
     
     @Namespace private var dealingNamespace
+    @State private var dealt: [SetGame.Card.ID] = []
+    @State private var discarded: [SetGame.Card.ID] = []
+
+    private func isDealt(_ card: SetGame.Card) -> Bool {
+        dealt.contains(card.id)
+    }
+    
+    private func isDiscarded(_ card: SetGame.Card) -> Bool {
+        discarded.contains(card.id)
+    }
     
     var deck: some View {
         ZStack {
-            myShape.frame(
+            myShape
+                .fill(.gray)
+                .frame(
                 width: Constants.drawDeckHeight * Constants.aspectRatio,
                 height: Constants.drawDeckHeight)
-            .overlay(myShape.fill(.gray))
             .overlay (ForEach(viewModel.cardsLeftInDeck) { card in
                 CardView(card)
                     .matchedGeometryEffect(id: card.id, in: dealingNamespace)
