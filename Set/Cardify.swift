@@ -17,13 +17,19 @@ struct Cardify: ViewModifier, Animatable {
     
     var isFaceUp: Bool {
         rotation < 90
+//        true
     }
     
     var rotation: Double
     
     var animatableData: Double {
-        get { return rotation }
-        set { rotation = newValue }
+        get {
+            return rotation            
+        }
+        set {
+            rotation = newValue
+            print("set: \(rotation)")
+        }
     }
     
     func body(content: Content) -> some View {
@@ -33,7 +39,7 @@ struct Cardify: ViewModifier, Animatable {
                 .background(base.foregroundStyle(.white))
                 .overlay(content)
                 .opacity(isFaceUp ? 1 : 0)
-            base.fill()
+            base.fill(.blue)
                 .opacity(isFaceUp ? 0 : 1)
         }
         .rotation3DEffect(.degrees(rotation), axis: (0, 1, 0))
@@ -42,7 +48,7 @@ struct Cardify: ViewModifier, Animatable {
         private struct Constants {
             static let cornerRadius: CGFloat = 12
             static let border: CGFloat = 4
-            static let selectedBorder: CGFloat = 10
+            static let selectedBorder: CGFloat = 24
     }
 }
 

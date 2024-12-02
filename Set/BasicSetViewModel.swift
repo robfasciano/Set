@@ -21,6 +21,10 @@ class BasicSetViewModel: ObservableObject {
     
     @Published private var model = createSetGame(1)
     
+//    var justPressedCard: [SetGame.Card] {
+//            model.faceUpCards.filter {justHit($0)}
+//    }
+    
     var faceUpCards: Array<SetGame.Card> {
         return model.faceUpCards
     }
@@ -108,7 +112,15 @@ class BasicSetViewModel: ObservableObject {
         if model.activePlayer == nil { return }
         if model.chooseCard(card, player: model.activePlayer!) {
             model.activePlayer = nil
+            if !model.anyVisibleMatches {
+                print("no matches")
+                model.deal(3)
+            } else { print("some matches")}
         }
+    }
+    
+    func postChoose(_ card: SetGame.Card) {
+        model.springCard(card)
     }
 
 }

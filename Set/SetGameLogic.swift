@@ -127,6 +127,7 @@ struct SetGame {
         var deselectPlayer = false
         
         cards[indexOfChosen(card)].isSelected.toggle()
+        cards[indexOfChosen(card)].justHit = true
         if numberOfSelectedCards == 3 {
             deselectPlayer = true
             if matchedSetSelected() {
@@ -143,6 +144,10 @@ struct SetGame {
             deselectAll()
         }
         return deselectPlayer
+    }
+    
+    mutating func springCard(_ card: Card) {
+        cards[indexOfChosen(card)].justHit = false
     }
     
     
@@ -301,6 +306,7 @@ struct SetGame {
         var isMatched = false
         var discardDeck = 0 //make sure to set this when isMatched==true
         var isSelected = false
+        var justHit = false
         let symbol: cardSymbol
         let count: symbolCount
         let shading: symbolShading

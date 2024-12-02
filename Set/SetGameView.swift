@@ -29,7 +29,8 @@ struct SetGameView: View {
         VStack {
             HStack{
                 discardColumn(topPlayer: 0)
-                cards.animation(.default, value: viewModel.cards)
+                cards //this animation is how displayed cards move when they change size
+                    .animation(.easeIn(duration: 1.0) , value: viewModel.cards)
                     .foregroundStyle(viewModel.cardBack)
                 discardColumn(topPlayer: 1)
             }
@@ -58,6 +59,8 @@ struct SetGameView: View {
 
     }
     
+    @State var springCard = false
+    
     private var cards: some View {
         let specialColor = viewModel.matchedCards ? viewModel.cardMatchBackground : viewModel.cardMismatchBackground
         return AspectVGrid(viewModel.faceUpCards, aspectRatio: Constants.aspectRatio) { card in
@@ -65,9 +68,16 @@ struct SetGameView: View {
                 CardView(card, card.isSelected && viewModel.threeCardsSelected ? specialColor : viewModel.cardBackground)
                     .matchedGeometryEffect(id: card.id, in: dealingNamespace)
                     .transition(.asymmetric(insertion: .identity, removal: .identity))
+//                    .transition(.identity)
+                    .scaleEffect(springCard ? 0.9 : 1)
                     .padding(4)
                     .onTapGesture {
                         viewModel.choose(card)
+                        springCard = true
+                        withAnimation(.spring(response: 0.2, dampingFraction: 0.3) ) {
+                            viewModel.postChoose(card)
+                            springCard = false
+                        }
                     }
             }
         }
@@ -98,12 +108,11 @@ struct SetGameView: View {
         }
     }
     
-    private let dealAnimation: Animation = .easeIn(duration: 0.40)
-    //        private let dealAnimation: Animation = .default
+    private let dealAnimation: Animation = .easeIn(duration: 1.40)
     private let dealInterval: TimeInterval = 0.15
     
-    func updateDealtCards() {
-        var delay: TimeInterval = 0
+    func updateDealtCards(delay: TimeInterval = 0) {
+        var delay = delay
         for card in viewModel.faceUpCards {
             if !dealt.contains(card.id) {
                 withAnimation(dealAnimation.delay(delay)) {
@@ -127,8 +136,7 @@ struct SetGameView: View {
             viewModel.newGame() //user intent
             clearBoard()
             viewModel.dealCards(12)
-            updateDealtCards()
-
+            updateDealtCards(delay: 0.3)
         })
         {
             VStack{
@@ -184,6 +192,8 @@ struct SetGameView: View {
     
     @Namespace private var dealingNamespace
     @State private var dealt: [SetGame.Card.ID] = []
+
+    @Namespace private var discardNamespace
     @State private var discarded: [SetGame.Card.ID] = []
 
     private func isDealt(_ card: SetGame.Card) -> Bool {
@@ -199,18 +209,21 @@ struct SetGameView: View {
             myShape
                 .fill(.gray)
                 .frame(
-                width: Constants.drawDeckHeight * Constants.aspectRatio,
-                height: Constants.drawDeckHeight)
-            .overlay (ForEach(viewModel.cardsLeftInDeck) { card in
-                CardView(card)
-                    .matchedGeometryEffect(id: card.id, in: dealingNamespace)
-                    .transition(.asymmetric(insertion: .identity, removal: .identity))
-            })
+                    width: Constants.drawDeckHeight * Constants.aspectRatio,
+                    height: Constants.drawDeckHeight)
+            ForEach(viewModel.cards.reversed(), id: \.id) { card in
+                if !dealt.contains(card.id) {
+                    CardView(card)
+                        .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+                        .transition(.asymmetric(insertion: .identity, removal: .identity))
+                        .frame(
+                            width: Constants.drawDeckHeight * Constants.aspectRatio,
+                            height: Constants.drawDeckHeight)
+                }
+            }
             Text("\(viewModel.cardsLeftInDeck.count)")
                 .foregroundStyle(.white).font(.largeTitle)
         }
-        .frame(width: Constants.drawDeckHeight * Constants.aspectRatio,
-               height: Constants.drawDeckHeight)
     }
     
     
