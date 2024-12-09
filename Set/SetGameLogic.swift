@@ -76,15 +76,15 @@ struct SetGame {
         score[player] += points
     }
     
-    var cardsLeftInDeck: Array<Card> {
-        var tempCards:Array<Card> = []
-        for i in cards {
-            if !i.isDealt {
-                tempCards.append(i)
-            }
-        }
-        return tempCards
-    }
+//    var cardsLeftInDeck: Array<Card> {
+//        var tempCards:Array<Card> = []
+//        for i in cards {
+//            if !i.isDealt {
+//                tempCards.append(i)
+//            }
+//        }
+//        return tempCards
+//    }
     
     func cardsInDiscardDeck(_ which: Int) -> Array<Card> {
         var tempCards:Array<Card> = []
@@ -96,79 +96,90 @@ struct SetGame {
         return tempCards
     }
     
+    mutating func addScoreForMatch() {
+        if activePlayer == nil {return}
+        score[activePlayer!] += Constants.scoreForMatch
+    }
     
+    mutating func addScoreForMismatch() {
+        if activePlayer == nil {return}
+        score[activePlayer!] += Constants.scoreForMismatch
+    }
+
     //this are the visibly face up cards, which means we exclude matched ones
-    var faceUpCards: Array<Card> {
-        var tempCards:Array<Card> = []
-        for i in cards {
-            if i.isDealt && !i.isMatched {
-                tempCards.append(i)
-            }
-        }
-        return tempCards
-    }
+//    var faceUpCards: Array<Card> {
+//        var tempCards:Array<Card> = []
+//        for i in cards {
+//            if i.isDealt && !i.isMatched {
+//                tempCards.append(i)
+//            }
+//        }
+//        return tempCards
+//    }
     
     
-    mutating func deal(_ toDeal: Int) {
-        var dealCount = 0
-        for i in 0..<cards.count {
-            if !cards[i].isDealt {
-                cards[i].isDealt = true
-                dealCount += 1
-                if dealCount == toDeal {
-                    return
-                }
-            }
-        }
-    }
+//    mutating func deal(_ toDeal: Int) {
+//        var dealCount = 0
+//        for i in 0..<cards.count {
+//            if !cards[i].isDealt {
+//                cards[i].isDealt = true
+//                dealCount += 1
+//                if dealCount == toDeal {
+//                    return
+//                }
+//            }
+//        }
+//    }
     
     
-    mutating func chooseCard(_ card: Card, player: Int) -> Bool {
-        var deselectPlayer = false
-        
-        cards[indexOfChosen(card)].isSelected.toggle()
-        cards[indexOfChosen(card)].justHit = true
-        if numberOfSelectedCards == 3 {
-            deselectPlayer = true
-            if matchedSetSelected() {
-                //show animation for good match
-                removeMatch(player: player)
-                score[player] += 1
-                if replaceMatchedCards {
-                    deal(3)
-                }
-            } else {
-                //show animation for bad match
-                score[player] -= 1
-            }
-            deselectAll()
-        }
-        return deselectPlayer
-    }
+//    mutating func chooseCard(_ card: Card, player: Int) -> Bool {
+//        var deselectPlayer = false
+//        
+//        cards[indexOfChosen(card)].isSelected.toggle()
+//        cards[indexOfChosen(card)].justHit = true
+//        if numberOfSelectedCards == 3 {
+//            deselectPlayer = true
+//            if matchedSetSelected() {
+//                //show animation for good match
+//                removeMatch(player: player)
+//                score[player] += 1
+//                if replaceMatchedCards {
+//                    deal(3) //FIXME: need to do this in the view
+//                }
+//            } else {
+//                //show animation for bad match
+//                score[player] -= 1
+//            }
+//            deselectAll()
+//        }
+//        return deselectPlayer
+//    }
     
     mutating func springCard(_ card: Card) {
         cards[indexOfChosen(card)].justHit = false
     }
     
     
-    mutating func deselectAll() {
-        for i in cards.indices {
-            cards[i].isSelected = false
-        }
-    }
+//    mutating func deselectAll() {
+//        for i in cards.indices {
+//            cards[i].isSelected = false
+//        }
+//    }
+//    
     
-    
-    var numberOfSelectedCards: Int {
-        var selectionCount = 0
-        for i in cards {
-            if i.isDealt && i.isSelected { selectionCount += 1}
-        }
-        return selectionCount
-    }
+//    var numberOfSelectedCards: Int {
+//        var selectionCount = 0
+//        for i in cards {
+//            if i.isSelected { selectionCount += 1}
+////            if i.isDealt && i.isSelected { selectionCount += 1}
+//        }
+//        return selectionCount
+//    }
     
     
     //MARK: funcs to check matching
     func threeCardsMatch(_ cardsToCheck: [Card]) -> Bool {
+        if cardsToCheck.count != 3 {return false}
         if colorSet(cardsToCheck)
             && symbolSet(cardsToCheck)
             && shadingSet(cardsToCheck)
@@ -178,9 +189,9 @@ struct SetGame {
         return false
     }
     
-    func matchedSetSelected() -> Bool {
-        threeCardsMatch(getSelectedCards())
-    }
+//    func matchedSetSelected() -> Bool {
+//        threeCardsMatch(getSelectedCards())
+//    }
     
     
     func colorSet(_ cardsSelected: [Card]) -> Bool {
@@ -235,40 +246,47 @@ struct SetGame {
         return false
     }
     
-    func getSelectedCards() -> [Card] {
-        var returnVal: Array<Card> = []
-        for i in cards {
-            if i.isSelected {
-                returnVal.append(i)
+//    func getSelectedCards() -> [Card] {
+//        var returnVal: Array<Card> = []
+//        for i in cards {
+//            if i.isSelected {
+//                returnVal.append(i)
+//            }
+//        }
+//        return returnVal
+//    }
+    
+    func card(from cardId: String) -> Card {
+        for cardToCheck in cards {
+            if cardToCheck.id == cardId {
+                return cardToCheck
             }
         }
-        return returnVal
+        return cards[0] //should never get here
     }
     
-    
-    var anyVisibleMatches: Bool {
-        for i in 0..<faceUpCards.count {
-            for j in i+1..<faceUpCards.count {
-                for k in j+1..<faceUpCards.count {
-                    if threeCardsMatch([faceUpCards[i], faceUpCards[j], faceUpCards[k]]) {
-                        return true
+    func anyVisibleMatches(CardIDs: [Card.ID]) -> Bool {
+            for i in 0..<CardIDs.count {
+                for j in i+1..<CardIDs.count {
+                    for k in j+1..<CardIDs.count {
+                        if threeCardsMatch([card(from: CardIDs[i]), card(from: CardIDs[j]), card(from: CardIDs[k])]) {
+                            return true
+                        }
                     }
                 }
             }
+            return false
         }
-        return false
-    }
     
-    mutating func removeMatch(player: Int) {
-        for i in cards.indices {
-            if cards[i].isSelected {
-                cards[i].isMatched = true
-                cards[i].discardDeck = player
-                cards[i].isSelected = false
-            }
-        }
-        
-    }
+//    mutating func removeMatch(player: Int) {
+//        for i in cards.indices {
+//            if cards[i].isSelected {
+//                cards[i].isMatched = true
+//                cards[i].discardDeck = player
+//                cards[i].isSelected = false
+//            }
+//        }
+//    }
     
     func indexOfChosen(_ card: Card) -> Int {
         var cardIndex = 0
@@ -302,10 +320,10 @@ struct SetGame {
         var debugDescription: String {
             CardDebugString(self)
         }
-        var isDealt = false
+//        var isDealt = false
         var isMatched = false
         var discardDeck = 0 //make sure to set this when isMatched==true
-        var isSelected = false
+//        var isSelected = false
         var justHit = false
         let symbol: cardSymbol
         let count: symbolCount
@@ -361,6 +379,8 @@ struct SetGame {
     
     private struct Constants {
         static let timeToChoose = 6.0
+        static let scoreForMatch = 1
+        static let scoreForMismatch = -1
     }
     
 }

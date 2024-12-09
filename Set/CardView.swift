@@ -9,23 +9,48 @@ import SwiftUI
 
 struct CardView: View {
     typealias Card = SetGame.Card
-    
+
     let card: Card
+    let isSelected: Bool
     let cardBackground: Color
     
-    init(_ card: Card, _ cardBackground: Color = .white) {
+    init(_ card: Card, faceUp: Bool, selected: Bool, cardColor: Color = .white) {
         self.card = card
-        self.cardBackground = cardBackground
+        rotation = faceUp ? 0 : 180
+        self.isSelected = selected
+        self.cardBackground = cardColor
     }
+    
+    var isFaceUp: Bool {
+        rotation < 90
+//        true
+    }
+
+    var rotation: Double
+    
+    var animatableData: Double {
+        get {
+            return rotation
+        }
+        set {
+            rotation = newValue
+            print("set: \(rotation)")
+        }
+    }
+
+    
 
     
     //what is this animation wrapper used for?  maybe card flip?
     var body: some View {
-        TimelineView(.animation(minimumInterval: 1/15)) { timeline in //could leave off minimum interval and let swift pick, larger intervals use less battery and are more choppy
+//        TimelineView(.animation(minimumInterval: 1/15)) { timeline in //could leave off minimum interval and let swift pick, larger intervals use less battery and are more choppy
+//        withAnimation {
                 cardContents
-                .cardify(isFaceUp: card.isDealt, isSelected: card.isSelected)
-//                .transition(.scale) //.opacity is default transition
-        }
+                .cardify(isFaceUp: isFaceUp, isSelected: isSelected)
+//                .rotation3DEffect(.degrees(rotation), axis: (0,1,0))
+//                .transition(.blurReplace) //.opacity is default transition
+//        }
+//        }
     }
         
     var cardContents: some View {
@@ -123,69 +148,69 @@ private struct Constants {
     VStack {
         HStack {
             CardView(SetGame.Card(
-                isDealt: true,
+//                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-                isSelected: false,
+//                isSelected: false,
                 symbol: .Squiggle,
                 count: .one,
                 shading: .striped,
                 color: .color1
-            )).aspectRatio(3/4, contentMode: .fit)
+            ), faceUp: true, selected: false).aspectRatio(3/4, contentMode: .fit)
             
             CardView(SetGame.Card(
-                isDealt: true,
+//                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-                isSelected: false,
+//                isSelected: false,
                 symbol: .Diamond,
                 count: .two,
                 shading: .filled,
                 color: .color2
-            )).aspectRatio(3/4, contentMode: .fit)
+            ), faceUp: true, selected: false).aspectRatio(3/4, contentMode: .fit)
             
             CardView(SetGame.Card(
-                isDealt: true,
+//                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-                isSelected: false,
+//                isSelected: false,
                 symbol: .Line,
                 count: .three,
                 shading: .open,
                 color: .color3
-            )).aspectRatio(3/4, contentMode: .fit)
+            ), faceUp: true, selected: false).aspectRatio(3/4, contentMode: .fit)
         }
         HStack {
             CardView(SetGame.Card(
-                isDealt: false,
+//                isDealt: false,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-                isSelected: false,
+//                isSelected: false,
                 symbol: .Line,
                 count: .two,
                 shading: .open,
                 color: .color1
-            )).aspectRatio(3/4, contentMode: .fit)
+            ), faceUp: false, selected: false).aspectRatio(3/4, contentMode: .fit)
             CardView(SetGame.Card(
-                isDealt: true,
+//                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-                isSelected: true,
+//                isSelected: true,
                 symbol: .Line,
                 count: .two,
                 shading: .open,
                 color: .color2
-            )).aspectRatio(3/4, contentMode: .fit)
+            ), faceUp: true, selected: true).aspectRatio(3/4, contentMode: .fit)
             CardView(SetGame.Card(
-                isDealt: true,
+//                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-                isSelected: true,
+//                isSelected: true,
                 symbol: .Squiggle,
                 count: .three,
                 shading: .filled,
                 color: .color3
-            )).aspectRatio(3/4, contentMode: .fit)
+            ), faceUp: true, selected: true).aspectRatio(3/4, contentMode: .fit)
         }
     }.foregroundStyle(.orange)
         .padding(20)

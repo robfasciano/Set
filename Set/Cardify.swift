@@ -11,26 +11,27 @@ struct Cardify: ViewModifier, Animatable {
     let isSelected: Bool
     
     init(isFaceUp: Bool, isSelected: Bool) {
-        rotation = isFaceUp ? 0 : 180
+        self.isFaceUp = isFaceUp
+//        rotation = isFaceUp ? 0 : 180
         self.isSelected = isSelected
     }
     
-    var isFaceUp: Bool {
-        rotation < 90
+    var isFaceUp: Bool //{
+//        rotation < 90
 //        true
-    }
+//    }
     
-    var rotation: Double
-    
-    var animatableData: Double {
-        get {
-            return rotation            
-        }
-        set {
-            rotation = newValue
-            print("set: \(rotation)")
-        }
-    }
+//    var rotation: Double
+//    
+//    var animatableData: Double {
+//        get {
+//            return rotation
+//        }
+//        set {
+//            rotation = newValue
+//            print("set: \(rotation)")
+//        }
+//    }
     
     func body(content: Content) -> some View {
         ZStack{
@@ -42,13 +43,13 @@ struct Cardify: ViewModifier, Animatable {
             base.fill(.blue)
                 .opacity(isFaceUp ? 0 : 1)
         }
-        .rotation3DEffect(.degrees(rotation), axis: (0, 1, 0))
+//        .rotation3DEffect(.degrees(rotation), axis: (0, 1, 0))
     }
         
         private struct Constants {
             static let cornerRadius: CGFloat = 12
-            static let border: CGFloat = 4
-            static let selectedBorder: CGFloat = 24
+            static let border: CGFloat = 3
+            static let selectedBorder: CGFloat = 20
     }
 }
 
