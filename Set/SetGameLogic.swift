@@ -76,16 +76,6 @@ struct SetGame {
         score[player] += points
     }
     
-//    var cardsLeftInDeck: Array<Card> {
-//        var tempCards:Array<Card> = []
-//        for i in cards {
-//            if !i.isDealt {
-//                tempCards.append(i)
-//            }
-//        }
-//        return tempCards
-//    }
-    
     func cardsInDiscardDeck(_ which: Int) -> Array<Card> {
         var tempCards:Array<Card> = []
         for i in cards {
@@ -105,76 +95,10 @@ struct SetGame {
         if activePlayer == nil {return}
         score[activePlayer!] += Constants.scoreForMismatch
     }
-
-    //this are the visibly face up cards, which means we exclude matched ones
-//    var faceUpCards: Array<Card> {
-//        var tempCards:Array<Card> = []
-//        for i in cards {
-//            if i.isDealt && !i.isMatched {
-//                tempCards.append(i)
-//            }
-//        }
-//        return tempCards
-//    }
-    
-    
-//    mutating func deal(_ toDeal: Int) {
-//        var dealCount = 0
-//        for i in 0..<cards.count {
-//            if !cards[i].isDealt {
-//                cards[i].isDealt = true
-//                dealCount += 1
-//                if dealCount == toDeal {
-//                    return
-//                }
-//            }
-//        }
-//    }
-    
-    
-//    mutating func chooseCard(_ card: Card, player: Int) -> Bool {
-//        var deselectPlayer = false
-//        
-//        cards[indexOfChosen(card)].isSelected.toggle()
-//        cards[indexOfChosen(card)].justHit = true
-//        if numberOfSelectedCards == 3 {
-//            deselectPlayer = true
-//            if matchedSetSelected() {
-//                //show animation for good match
-//                removeMatch(player: player)
-//                score[player] += 1
-//                if replaceMatchedCards {
-//                    deal(3) //FIXME: need to do this in the view
-//                }
-//            } else {
-//                //show animation for bad match
-//                score[player] -= 1
-//            }
-//            deselectAll()
-//        }
-//        return deselectPlayer
-//    }
     
     mutating func springCard(_ card: Card) {
         cards[indexOfChosen(card)].justHit = false
     }
-    
-    
-//    mutating func deselectAll() {
-//        for i in cards.indices {
-//            cards[i].isSelected = false
-//        }
-//    }
-//    
-    
-//    var numberOfSelectedCards: Int {
-//        var selectionCount = 0
-//        for i in cards {
-//            if i.isSelected { selectionCount += 1}
-////            if i.isDealt && i.isSelected { selectionCount += 1}
-//        }
-//        return selectionCount
-//    }
     
     
     //MARK: funcs to check matching
@@ -188,10 +112,6 @@ struct SetGame {
         }
         return false
     }
-    
-//    func matchedSetSelected() -> Bool {
-//        threeCardsMatch(getSelectedCards())
-//    }
     
     
     func colorSet(_ cardsSelected: [Card]) -> Bool {
@@ -359,9 +279,9 @@ struct SetGame {
             case .open:
                 tempString.append("open ")
             case .striped:
-                tempString.append("striped ")
+                tempString.append("stripe ")
             case .filled:
-                tempString.append("filled ")
+                tempString.append("fill ")
             }
             
             switch card.symbol {
@@ -370,7 +290,7 @@ struct SetGame {
             case .Squiggle:
                 tempString.append("⌁")
             case .Line:
-                tempString.append("⎯")
+                tempString.append("-")
             }
             
             return tempString

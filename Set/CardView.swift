@@ -9,50 +9,25 @@ import SwiftUI
 
 struct CardView: View {
     typealias Card = SetGame.Card
-
+    
     let card: Card
+    let isFaceUp: Bool
     let isSelected: Bool
     let cardBackground: Color
     
     init(_ card: Card, faceUp: Bool, selected: Bool, cardColor: Color = .white) {
         self.card = card
-        rotation = faceUp ? 0 : 180
+        self.isFaceUp = faceUp
         self.isSelected = selected
         self.cardBackground = cardColor
     }
     
-    var isFaceUp: Bool {
-        rotation < 90
-//        true
-    }
-
-    var rotation: Double
     
-    var animatableData: Double {
-        get {
-            return rotation
-        }
-        set {
-            rotation = newValue
-            print("set: \(rotation)")
-        }
-    }
-
-    
-
-    
-    //what is this animation wrapper used for?  maybe card flip?
     var body: some View {
-//        TimelineView(.animation(minimumInterval: 1/15)) { timeline in //could leave off minimum interval and let swift pick, larger intervals use less battery and are more choppy
-//        withAnimation {
-                cardContents
-                .cardify(isFaceUp: isFaceUp, isSelected: isSelected)
-//                .rotation3DEffect(.degrees(rotation), axis: (0,1,0))
-//                .transition(.blurReplace) //.opacity is default transition
-//        }
-//        }
+        cardContents
+            .cardify(isFaceUp: isFaceUp, isSelected: isSelected)
     }
-        
+    
     var cardContents: some View {
         VStack {
             switch card.count { //leaving as enums.  Maybe I will want .one to be 4 shapes? or 7?
@@ -87,7 +62,6 @@ struct CardView: View {
                                               endPoint: UnitPoint(x: 1, y: 0)))
                 .stroke(color(card), lineWidth: 4)
                 .aspectRatio(Constants.shapeAspect, contentMode: .fit)
-                
             case .Squiggle:
                 Squiggle().fill(
                     LinearGradient(colors: pattern(card, backColor),
@@ -98,9 +72,10 @@ struct CardView: View {
                 .aspectRatio(Constants.shapeAspect, contentMode: .fit)
             case .Line:
                 RoundedRectangle(cornerRadius: 50).fill(LinearGradient(colors: pattern(card, backColor),startPoint: UnitPoint(x: 0, y: 0), endPoint: UnitPoint(x: 1, y: 0)))
-                .stroke(color(card), lineWidth: 4)
-                .aspectRatio(Constants.shapeAspect, contentMode: .fit)
+                    .stroke(color(card), lineWidth: 4)
+                    .aspectRatio(Constants.shapeAspect, contentMode: .fit)
             }
+
         }
         
         
@@ -111,6 +86,8 @@ struct CardView: View {
             case .striped:
                 var colorArray = [color(card)]
                 for _ in 1...Constants.numStripes {
+                    colorArray.append(backColor)
+                    colorArray.append(backColor)
                     colorArray.append(backColor)
                     colorArray.append(color(card))
                 }
@@ -139,7 +116,7 @@ private struct Constants {
     static let shapeAspect = 3.0
     static let border = 4
     static let numStripes = 20
-
+    
 }
 
 
@@ -148,10 +125,10 @@ private struct Constants {
     VStack {
         HStack {
             CardView(SetGame.Card(
-//                isDealt: true,
+                //                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-//                isSelected: false,
+                //                isSelected: false,
                 symbol: .Squiggle,
                 count: .one,
                 shading: .striped,
@@ -159,10 +136,10 @@ private struct Constants {
             ), faceUp: true, selected: false).aspectRatio(3/4, contentMode: .fit)
             
             CardView(SetGame.Card(
-//                isDealt: true,
+                //                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-//                isSelected: false,
+                //                isSelected: false,
                 symbol: .Diamond,
                 count: .two,
                 shading: .filled,
@@ -170,42 +147,42 @@ private struct Constants {
             ), faceUp: true, selected: false).aspectRatio(3/4, contentMode: .fit)
             
             CardView(SetGame.Card(
-//                isDealt: true,
+                //                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-//                isSelected: false,
+                //                isSelected: false,
                 symbol: .Line,
                 count: .three,
-                shading: .open,
+                shading: .striped,
                 color: .color3
             ), faceUp: true, selected: false).aspectRatio(3/4, contentMode: .fit)
         }
         HStack {
             CardView(SetGame.Card(
-//                isDealt: false,
+                //                isDealt: false,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-//                isSelected: false,
+                //                isSelected: false,
                 symbol: .Line,
                 count: .two,
                 shading: .open,
                 color: .color1
             ), faceUp: false, selected: false).aspectRatio(3/4, contentMode: .fit)
             CardView(SetGame.Card(
-//                isDealt: true,
+                //                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-//                isSelected: true,
+                //                isSelected: true,
                 symbol: .Line,
                 count: .two,
                 shading: .open,
                 color: .color2
             ), faceUp: true, selected: true).aspectRatio(3/4, contentMode: .fit)
             CardView(SetGame.Card(
-//                isDealt: true,
+                //                isDealt: true,
                 isMatched: false,
                 discardDeck: 0, //make sure to set this when isMatched==true
-//                isSelected: true,
+                //                isSelected: true,
                 symbol: .Squiggle,
                 count: .three,
                 shading: .filled,
@@ -214,5 +191,5 @@ private struct Constants {
         }
     }.foregroundStyle(.orange)
         .padding(20)
-        
+    
 }

@@ -11,28 +11,16 @@ struct SetGameView: View {
     
     @ObservedObject var viewModel: BasicSetViewModel
     
-    private struct Constants {
-        static let aspectRatio: CGFloat = 2/3
-        static let drawDeckHeight: CGFloat = 100
-        static let discardDeckHeight: CGFloat = 150
-        static let discardDeckOpacity: CGFloat = 0.5
-        //        struct FontSize {
-        //            static let largest: CGFloat = 200
-        //            static let smallest: CGFloat = 10
-        //            static let scaleFactor = smallest / largest
-        //        }
-    }
     
     @Namespace private var dealingNamespace
     @State private var dealt: [SetGame.Card.ID] = []
     
     @Namespace private var discardNamespace
     @State private var discarded: [[SetGame.Card.ID]] = [[],[],[],[],[],[]]
-    //need to differntiate discard piles somehow
     
     @State var selectedCardIDs: [SetGame.Card.ID] = []
     
-    let myShape = RoundedRectangle(cornerRadius: 9)
+    let cardShape = RoundedRectangle(cornerRadius: 9)
     
     var body: some View {
         VStack {
@@ -40,7 +28,7 @@ struct SetGameView: View {
                 discardColumn(topPlayer: 0)
                     .animation(.linear, value: viewModel.numPlayers)
                 cards //this animation is how displayed cards move when they change size
-                    .animation(.easeIn(duration: 1.0), value: viewModel.cards)
+//                    .animation(.easeIn(duration: 1.0), value: viewModel.cards)
                     .foregroundStyle(viewModel.cardBack)
                 discardColumn(topPlayer: 1)
                     .animation(.easeInOut, value: viewModel.numPlayers)
@@ -77,28 +65,28 @@ struct SetGameView: View {
     
     private var cards: some View {
         let specialColor = matched ? viewModel.cardMatchBackground : viewModel.cardMismatchBackground
-        return AspectVGrid(viewModel.cards.filter{dealt.contains($0.id)}, aspectRatio: Constants.aspectRatio) { card in
+        return AspectVGrid(viewModel.cards.filter{isDealt($0.id)}, aspectRatio: Constants.aspectRatio) { card in
             CardView(card,
                      faceUp: true,
                      selected: selectedCardIDs.contains(card.id) && viewModel.activePlayer != nil,
                      cardColor: selectedCardIDs.contains(card.id) && selectedCardIDs.count == 3 ? specialColor : viewModel.cardBackground)
-                .matchedGeometryEffect(id: card.id, in: dealingNamespace)
-                .transition(.asymmetric(insertion: .identity, removal: .identity))
-            //                    .transition(.identity)
-//                .scaleEffect(springCard ? 0.9 : 1)
-                .padding(4)
-                .onTapGesture {
-                    choose(card.id)
-//                    springCard = true
-//                    withAnimation(.spring(response: 0.2, dampingFraction: 0.3) ) {
-//                        viewModel.postChoose(card)
-//                        springCard = false
-//                    }
-                }
+            .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+            .transition(.asymmetric(insertion: .identity, removal: .identity))
+//            .transition(.identity)
+            .padding(4) //should this be accounted for in aspectvgrid?
+            .onTapGesture {
+                choose(card.id)
+                //                    springCard = true
+                //                    withAnimation(.spring(response: 0.2, dampingFraction: 0.3) ) {
+                //                        viewModel.postChoose(card)
+                //                        springCard = false
+                //                    }
+            }
         }
     }
     
     func choose(_ cardID: SetGame.Card.ID) {
+        if viewModel.activePlayer == nil { return }
         if selectedCardIDs.contains(cardID) {
             selectedCardIDs.removeAll(where: {$0 == cardID})
             return
@@ -110,7 +98,6 @@ struct SetGameView: View {
         selectedCardIDs.append(cardID)
         if selectedCardIDs.count == 3 {
             if matched {
-                print("matched")
                 viewModel.addScoreForMatch()
                 for i in selectedCardIDs {
                     discarded[viewModel.activePlayer!].append(i)
@@ -118,7 +105,6 @@ struct SetGameView: View {
                     addCardsToBoard()
                 }
             } else {
-                print("mismatched")
                 viewModel.addScoreForMismatch()
             }
             deselectAll()
@@ -126,11 +112,9 @@ struct SetGameView: View {
     }
     
     func addCardsToBoard() {
-        while !viewModel.anyVisibleMatches(IDs: dealt) && cardsInDeck > 0 {
-            dealCards(3)
-            print("3 dealt")
+        while !viewModel.anyVisibleMatches(IDs: dealt) && numCardsInDeck > 0 {
+            dealCards(Constants.incrementalDealCount)
         }
-        
     }
     
     func deselectAll() {
@@ -151,45 +135,48 @@ struct SetGameView: View {
             HStack {
                 VStack {
                     Text("Players").font(.largeTitle)
-                    Stepper ("Player", value: $viewModel.numPlayers, in: 1...6)
+                    Stepper ("Player", value: $viewModel.numPlayers, in: 1...discarded.count)
                         .labelsHidden()
                         .onChange(of: viewModel.numPlayers) {
-                            clearBoard()
+                            withAnimation(dealAnimation) {
+                                clearBoard()
+                            }
                         }
                 }
                 Spacer()
                 deck
-                    .onTapGesture {
-                        dealCards(3) //user intent
-                    }
-                
                 Spacer()
                 newGame
             }
         }
     }
     
-    private let dealAnimation: Animation = .easeIn(duration: 1.40)
-    private let dealInterval: TimeInterval = 0.10
+    private let dealAnimation: Animation = .easeIn(duration: Constants.deal.speed)
+    private let dealInterval: TimeInterval = Constants.deal.interval
     
-    func dealCards(_ count: Int, delay: TimeInterval = 0) {
-        var delay = delay
+    func dealCards(_ count: Int) {
+        var delay: TimeInterval = 0
         var count = count
+        
+        
+        //        withAnimation(.default.delay(delay)) {
         for card in viewModel.cards.filter({
-                !dealt.contains($0.id)
-                && !isDiscarded($0.id)
-            }) {
+                !isDealt($0.id)
+            && !isDiscarded($0.id)
+        }) {
             if count > 0 {
                 withAnimation(dealAnimation.delay(delay)) {
-                    dealt.append(card.id)
+//                    let temp = isDealt(card.id)
+                    dealt.append(card.id) //with animation around this does not give desired effect
+//                    print(temp, card.id, isDealt(card.id))
                 }
                 count -= 1
                 delay += dealInterval
             }
         }
     }
-    
-    
+
+
     func clearBoard() {
         dealt = []
         discarded = [[],[],[],[],[],[]]
@@ -198,11 +185,12 @@ struct SetGameView: View {
     
     var newGame: some View {
         Button(action: {
-            viewModel.newGame() //user intent
             withAnimation(dealAnimation) {
                 clearBoard()
             } completion: {
-                dealCards(12)
+                viewModel.newGame() //user intent
+//                dealCards(1)
+                dealCards(Constants.newDealCount)
                 addCardsToBoard()
             }
         })
@@ -218,10 +206,10 @@ struct SetGameView: View {
     func discardPile(_ player: Int) -> some View {
         VStack {
             ZStack {
-                myShape.frame(
-                    width: Constants.discardDeckHeight * Constants.aspectRatio,
-                    height: Constants.discardDeckHeight)
-                .overlay(myShape.fill(.gray))
+                cardShape.frame(
+                    width: Constants.discardDeck.height * Constants.aspectRatio,
+                    height: Constants.discardDeck.height)
+                .overlay(cardShape.fill(.gray))
                 .overlay(ForEach (viewModel.cards.filter{discarded[player].contains($0.id)}) { card in
                     CardView(card, faceUp: true,
                              selected: false)
@@ -241,28 +229,27 @@ struct SetGameView: View {
         .disabled(viewModel.activePlayer != nil)
     }
     
-    
     func countdown(_ player: Int) -> some View {
         // >= 1/15 is smooth, 1 is 'click'-like
         return TimelineView(.animation(minimumInterval: 1/15)) { timeline in
             VStack(spacing: 0) { //must be inside TimelineView to keep spacing = 0
-                myShape
+                cardShape
                     .fill(.clear)
                     .frame(
-                        width: Constants.discardDeckHeight * Constants.aspectRatio,
-                        height: Constants.discardDeckHeight * (1 - viewModel.timerPercentRemaining / 100.0))
-                myShape
+                        width: Constants.discardDeck.height * Constants.aspectRatio,
+                        height: Constants.discardDeck.height * (1 - viewModel.timerPercentRemaining / 100.0))
+                cardShape
                     .fill(viewModel.activePlayer == player ? .red : .clear)
-                    .opacity(discarded[player].isEmpty ? 1.0 : Constants.discardDeckOpacity)
+                    .opacity(discarded[player].isEmpty ? 1.0 : Constants.discardDeck.opacity)
                     .frame(
-                        width: Constants.discardDeckHeight * Constants.aspectRatio,
-                        height: Constants.discardDeckHeight * (viewModel.timerPercentRemaining / 100.0))
+                        width: Constants.discardDeck.height * Constants.aspectRatio,
+                        height: Constants.discardDeck.height * (viewModel.timerPercentRemaining / 100.0))
             }
         }
     }
     
-    private func isDealt(_ card: SetGame.Card) -> Bool {
-        dealt.contains(card.id)
+    private func isDealt(_ cardID: SetGame.Card.ID) -> Bool {
+        dealt.contains(cardID)
     }
     
     private func isDiscarded(_ cardID: SetGame.Card.ID) -> Bool {
@@ -276,28 +263,30 @@ struct SetGameView: View {
     
     var deck: some View {
         ZStack {
-            myShape
+            cardShape
                 .fill(.gray)
                 .frame(
                     width: Constants.drawDeckHeight * Constants.aspectRatio,
                     height: Constants.drawDeckHeight)
-            ForEach(viewModel.cards.reversed(), id: \.id) { card in
-                if !dealt.contains(card.id) && isDiscarded(card.id) {
-                    CardView(card, faceUp: false, selected: false)
-                        .matchedGeometryEffect(id: card.id, in: dealingNamespace)
-                        .transition(.scale)
-                        .transition(.asymmetric(insertion: .identity, removal: .identity))
-                        .frame(
-                            width: Constants.drawDeckHeight * Constants.aspectRatio,
-                            height: Constants.drawDeckHeight)
-                }
-            }
-            Text("\(cardsInDeck)")
+                .overlay(
+                    ForEach(viewModel.cards.filter{!isDealt($0.id) && !isDiscarded($0.id)}) { card in
+                        CardView(card, faceUp: false, selected: false)
+                            .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+                            .transition(.asymmetric(insertion: .identity, removal: .identity))
+                    })
+            Text("\(numCardsInDeck)")
                 .foregroundStyle(.white).font(.largeTitle)
         }
+        .onTapGesture {
+            if viewModel.activePlayer == nil {
+//                dealCards(1) //user intent
+                    dealCards(Constants.incrementalDealCount) //user intent
+            }
+        }
+        
     }
     
-    var cardsInDeck: Int {
+    var numCardsInDeck: Int {
         var count = viewModel.cards.count  - dealt.count
         for i in discarded {
             count -= i.count
@@ -305,6 +294,26 @@ struct SetGameView: View {
         return count
     }
     
+    private struct Constants {
+        static let newDealCount = 12
+        static let incrementalDealCount = 3
+        static let aspectRatio: CGFloat = 2/3
+        static let drawDeckHeight: CGFloat = 100
+        struct deal {
+            static let speed = 0.4
+            static let interval = 0.15
+        }
+        struct discardDeck {
+            static let height: CGFloat = 150
+            static let opacity: CGFloat = 0.5
+        }
+        //        struct FontSize {
+        //            static let largest: CGFloat = 200
+        //            static let smallest: CGFloat = 10
+        //            static let scaleFactor = smallest / largest
+        //        }
+    }
+
 }
 
 #Preview {

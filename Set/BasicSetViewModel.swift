@@ -20,15 +20,7 @@ class BasicSetViewModel: ObservableObject {
 
     
     @Published private var model = createSetGame(1)
-    
-//    var justPressedCard: [SetGame.Card] {
-//            model.faceUpCards.filter {justHit($0)}
-//    }
-    
-//    var faceUpCards: Array<SetGame.Card> {
-//        return model.faceUpCards
-//    }
-    
+        
     var activePlayer: Int? {
             model.activePlayer
     }
@@ -59,30 +51,6 @@ class BasicSetViewModel: ObservableObject {
     func isMatched(_ cards: [SetGame.Card]) -> Bool {
         model.threeCardsMatch(cards)
     }
-//    var anyVisibleMatches: Bool {
-//        return model.anyVisibleMatches
-//    }
-
-//    var matchedCards: Bool {
-//        if threeCardsSelected {
-//            if model.matchedSetSelected() {
-//                return true
-//            }
-//        }
-//        return false
-//    }
-
-//    var cardsLeftInDeck: Array<SetGame.Card> {
-//        model.cardsLeftInDeck
-//    }
- 
-//    func cardsInDiscardDeck(_ which: Int) -> Array<SetGame.Card> {
-//        model.cardsInDiscardDeck(which)
-//    }
-    
-//    var threeCardsSelected: Bool {
-//        model.getSelectedCards().count == 3
-//    }
     
     func anyVisibleMatches(IDs: [SetGame.Card.ID]) -> Bool {
         model.anyVisibleMatches(CardIDs: IDs)
@@ -109,29 +77,11 @@ class BasicSetViewModel: ObservableObject {
         model.score(player: player)
     }
     
-    private let dealInterval: TimeInterval = 0.5
-
     //MARK: Intents
-//    func dealCards(_ numberOfCards: Int) {
-//        model.deal(numberOfCards)
-//    }
-    
     func newGame() {
         model.activePlayer = nil
-//        model = BasicSetViewModel.createSetGame(4)
         model = BasicSetViewModel.createSetGame(numPlayers)
     }
-
-//    func choose(_ card: SetGame.Card) {
-//        if model.activePlayer == nil { return }
-//        if model.chooseCard(card, player: model.activePlayer!) {
-//            model.activePlayer = nil
-//            if !model.anyVisibleMatches() {
-//                print("no matches")
-//                model.deal(3)
-//            } else { print("some matches")}
-//        }
-//    }
     
     func postChoose(_ card: SetGame.Card) {
         model.springCard(card)

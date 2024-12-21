@@ -11,6 +11,8 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
     var items: [Item]
     var aspectRatio: CGFloat = 1
     var content: (Item) -> ItemView
+    let minItemCount: CGFloat = 12 //need to ensure minimum items so view is always on screen for matchedgeometryeffect to work
+    
     
     
     init(_ items: [Item], aspectRatio: CGFloat, @ViewBuilder content: @escaping (Item) -> ItemView) {
@@ -28,9 +30,8 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
                 size: geometry.size,
                 atAspectRatio: aspectRatio
             )
-            
 //TODO: this totally works, but there is redundant code.  Maybe I can clean this up
-            if (gridItemSize == minGridWidth) {
+                if (gridItemSize == minGridWidth) {
                 ScrollView {
                     LazyVGrid(columns: [GridItem(.adaptive(minimum: gridItemSize), spacing: 0)], spacing: 0) {
                         ForEach(items) { item in
@@ -48,6 +49,7 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
                 }
             }
         }
+
     }
     
     
@@ -57,7 +59,8 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
         atAspectRatio aspectRatio: CGFloat
     ) -> CGFloat {
         
-        let count = CGFloat(count)
+//        let count = count<Int(Constants.minItemCount) ? Constants.minItemCount : CGFloat(count)
+        let count = count < Int(minItemCount) ? minItemCount : CGFloat(count)
         var columnCount = 1.0
         var returnValue = 0.0
 
@@ -76,8 +79,12 @@ struct AspectVGrid<Item: Identifiable, ItemView: View>: View {
         returnValue =  max(min(size.width / count, size.height * aspectRatio).rounded(.down), minGridWidth)
         return returnValue
     }
-    
+   
+
 }
+
+
+
 
 
 
