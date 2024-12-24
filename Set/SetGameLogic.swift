@@ -297,7 +297,7 @@ struct SetGame {
         }
     }
     
-    private struct Constants {
+    struct Constants {
         static let timeToChoose = 6.0
         static let scoreForMatch = 1
         static let scoreForMismatch = -1

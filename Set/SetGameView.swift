@@ -20,24 +20,39 @@ struct SetGameView: View {
     
     @State var selectedCardIDs: [SetGame.Card.ID] = []
     
+    @State var showXXX = false
+    @State var spinCard = false
+
+    
     let cardShape = RoundedRectangle(cornerRadius: 9)
     
     var body: some View {
-        VStack {
-            HStack{
-                discardColumn(topPlayer: 0)
-                    .animation(.linear, value: viewModel.numPlayers)
-                cards //this animation is how displayed cards move when they change size
-//                    .animation(.easeIn(duration: 1.0), value: viewModel.cards)
-                    .foregroundStyle(viewModel.cardBack)
-                discardColumn(topPlayer: 1)
-                    .animation(.easeInOut, value: viewModel.numPlayers)
+        ZStack {
+            VStack {
+                HStack{
+                    discardColumn(topPlayer: 0)
+                        .animation(.linear, value: viewModel.numPlayers)
+                    cards //this animation is how displayed cards move when they change size
+                    //                    .animation(.easeIn(duration: 1.0), value: viewModel.cards)
+                        .foregroundStyle(viewModel.cardBack)
+                    
+                    discardColumn(topPlayer: 1)
+                        .animation(.easeInOut, value: viewModel.numPlayers)
+                }
+                Spacer()
+                bottomButtons
             }
-            Spacer()
-            bottomButtons
+            .padding()
+            Text(viewModel.displayString)
+                .font(.largeTitle)
+                .fontWeight(.black)
+                .scaleEffect(showXXX ? 150 : 0)
+                .opacity(showXXX ? 0 : 1)
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.red)
         }
-        .padding()
     }
+
     
     func discardColumn(topPlayer: Int) -> some View {
         VStack {
@@ -61,7 +76,7 @@ struct SetGameView: View {
         }
     }
     
-    @State var springCard = false
+//    @State var springCard = false
     
     private var cards: some View {
         let specialColor = matched ? viewModel.cardMatchBackground : viewModel.cardMismatchBackground
@@ -70,17 +85,17 @@ struct SetGameView: View {
                      faceUp: true,
                      selected: selectedCardIDs.contains(card.id) && viewModel.activePlayer != nil,
                      cardColor: selectedCardIDs.contains(card.id) && selectedCardIDs.count == 3 ? specialColor : viewModel.cardBackground)
+            //matched
+            .rotationEffect(Angle(degrees: spinCard &&  selectedCardIDs.contains(card.id) ? 720 : 0))
+            .scaleEffect (spinCard &&  selectedCardIDs.contains(card.id) ? 1.25 : 1)
+//            .zIndex(spinCard &&  selectedCardIDs.contains(card.id) ? 10 : 1)
             .matchedGeometryEffect(id: card.id, in: dealingNamespace)
+            .matchedGeometryEffect(id: card.id, in: discardNamespace)
             .transition(.asymmetric(insertion: .identity, removal: .identity))
 //            .transition(.identity)
             .padding(4) //should this be accounted for in aspectvgrid?
             .onTapGesture {
                 choose(card.id)
-                //                    springCard = true
-                //                    withAnimation(.spring(response: 0.2, dampingFraction: 0.3) ) {
-                //                        viewModel.postChoose(card)
-                //                        springCard = false
-                //                    }
             }
         }
     }
@@ -98,16 +113,31 @@ struct SetGameView: View {
         selectedCardIDs.append(cardID)
         if selectedCardIDs.count == 3 {
             if matched {
-                viewModel.addScoreForMatch()
-                for i in selectedCardIDs {
-                    discarded[viewModel.activePlayer!].append(i)
-                    dealt.removeAll(where: {$0 == i})
-                    addCardsToBoard()
+                withAnimation(.easeInOut(duration: 2.0)) {
+                    spinCard = true
+                } completion: {
+                    spinCard = false
+                    viewModel.addScoreForMatch()
+                    for i in selectedCardIDs {
+                        discarded[viewModel.activePlayer!].append(i)
+                        dealt.removeAll(where: {$0 == i})
+                        addCardsToBoard()
+                    }
+                    deselectAll()
                 }
             } else {
+                viewModel.displayString = Constants.mismatchString
+                withAnimation(.easeIn(duration: 0.9)) {
+                    showXXX = true
+                } completion: {
+                    showXXX = false
+                    deselectAll()
+                    viewModel.displayString = Constants.timeOverString
+                }
                 viewModel.addScoreForMismatch()
             }
-            deselectAll()
+               
+            
         }
     }
     
@@ -213,11 +243,16 @@ struct SetGameView: View {
                 .overlay(ForEach (viewModel.cards.filter{discarded[player].contains($0.id)}) { card in
                     CardView(card, faceUp: true,
                              selected: false)
-                    .foregroundStyle(viewModel.cardBack)})
+                    .foregroundStyle(viewModel.cardBack)
+                    .matchedGeometryEffect(id: card.id, in: discardNamespace)
+                    .transition(.asymmetric(insertion: .identity, removal: .identity))
+                }
+                )
                 if viewModel.activePlayer == player {
                     countdown(player)
                 }
             }
+            
             
             Text("Player \(player + 1)").font(.title)
             Text("\(viewModel.score(player))").font(.largeTitle).fontWeight(.heavy)
@@ -307,6 +342,9 @@ struct SetGameView: View {
             static let height: CGFloat = 150
             static let opacity: CGFloat = 0.5
         }
+        static let mismatchString = "☠️☠️☠️"
+        static let timeOverString = "⏰⏰⏰"
+
         //        struct FontSize {
         //            static let largest: CGFloat = 200
         //            static let smallest: CGFloat = 10

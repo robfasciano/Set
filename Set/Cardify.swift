@@ -9,11 +9,13 @@ import SwiftUI
 
 struct Cardify: ViewModifier, Animatable {
     let isSelected: Bool
-    
-    init(isFaceUp: Bool, isSelected: Bool) {
+    let background: Color
+
+    init(isFaceUp: Bool, isSelected: Bool, background: Color) {
 //        self.isFaceUp = isFaceUp
         rotation = isFaceUp ? 0 : 180
         self.isSelected = isSelected
+        self.background = background
     }
     
     var isFaceUp: Bool {
@@ -36,7 +38,7 @@ struct Cardify: ViewModifier, Animatable {
             ZStack{
                 let base = RoundedRectangle(cornerRadius: Constants.cornerRadius)
                 base.strokeBorder(lineWidth: isSelected ? Constants.selectedBorder : Constants.border)
-                    .background(base.foregroundStyle(.white))
+                    .background(base.foregroundStyle(background))
                     .overlay(content)
                     .opacity(isFaceUp ? 1 : 0)
                 base.fill(.blue)
@@ -53,8 +55,8 @@ struct Cardify: ViewModifier, Animatable {
 }
 
 extension View {
-    func cardify(isFaceUp: Bool, isSelected: Bool) -> some View {
-        modifier(Cardify(isFaceUp: isFaceUp, isSelected: isSelected))
+    func cardify(isFaceUp: Bool, isSelected: Bool, background: Color) -> some View {
+        modifier(Cardify(isFaceUp: isFaceUp, isSelected: isSelected, background: background))
     }
 }
 

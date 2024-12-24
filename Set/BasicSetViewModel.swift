@@ -20,7 +20,9 @@ class BasicSetViewModel: ObservableObject {
 
     
     @Published private var model = createSetGame(1)
-        
+    
+    var displayString = ""
+
     var activePlayer: Int? {
             model.activePlayer
     }
@@ -31,7 +33,7 @@ class BasicSetViewModel: ObservableObject {
     }
     
     private func timerDone() {
-        model.addScore(model.activePlayer!, points: -1)
+        model.addScore(model.activePlayer!, points: SetGame.Constants.scoreForMismatch)
         model.activePlayer = nil
     }
 

@@ -25,7 +25,7 @@ struct CardView: View {
     
     var body: some View {
         cardContents
-            .cardify(isFaceUp: isFaceUp, isSelected: isSelected)
+            .cardify(isFaceUp: isFaceUp, isSelected: isSelected, background: cardBackground)
     }
     
     var cardContents: some View {
@@ -48,10 +48,11 @@ struct CardView: View {
     struct oneShape: View {
         let card: SetGame.Card
         let backColor: Color
-        
+
         init(_ card: SetGame.Card, _ backColor: Color) {
             self.card = card
-            self.backColor = backColor
+//            self.backColor = backColor
+            self.backColor = .white
         }
         
         var body: some View {
