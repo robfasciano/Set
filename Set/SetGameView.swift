@@ -118,9 +118,11 @@ struct SetGameView: View {
                 } completion: {
                     spinCard = false
                     viewModel.addScoreForMatch()
-                    for i in selectedCardIDs {
+                    withAnimation(dealAnimation) {
+                        for i in selectedCardIDs {
                             discarded[playerNum].append(i)
-                        dealt.removeAll(where: {$0 == i})
+                            dealt.removeAll(where: {$0 == i})
+                        }
                         addCardsToBoard()
                     }
                     deselectAll()
@@ -187,8 +189,6 @@ struct SetGameView: View {
     func dealCards(_ count: Int) {
         var delay: TimeInterval = 0
         var count = count
-        
-        
         //        withAnimation(.default.delay(delay)) {
         for card in viewModel.cards.filter({
                 !isDealt($0.id)
@@ -252,8 +252,6 @@ struct SetGameView: View {
                     countdown(player)
                 }
             }
-            
-            
             Text("Player \(player + 1)").font(.title)
             Text("\(viewModel.score(player))").font(.largeTitle).fontWeight(.heavy)
         }
