@@ -33,7 +33,8 @@ class BasicSetViewModel: ObservableObject {
     }
     
     private func timerDone() {
-        model.addScore(model.activePlayer!, points: SetGame.Constants.scoreForMismatch)
+        guard let numPlayer = model.activePlayer else { return }
+        model.addScore(numPlayer, points: SetGame.Constants.scoreForMismatch)
         model.activePlayer = nil
     }
 

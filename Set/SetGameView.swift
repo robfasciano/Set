@@ -101,7 +101,7 @@ struct SetGameView: View {
     }
     
     func choose(_ cardID: SetGame.Card.ID) {
-        if viewModel.activePlayer == nil { return }
+        guard let playerNum = viewModel.activePlayer else { return }
         if selectedCardIDs.contains(cardID) {
             selectedCardIDs.removeAll(where: {$0 == cardID})
             return
@@ -119,7 +119,7 @@ struct SetGameView: View {
                     spinCard = false
                     viewModel.addScoreForMatch()
                     for i in selectedCardIDs {
-                        discarded[viewModel.activePlayer!].append(i)
+                            discarded[playerNum].append(i)
                         dealt.removeAll(where: {$0 == i})
                         addCardsToBoard()
                     }
@@ -311,11 +311,11 @@ struct SetGameView: View {
                     })
             Text("\(numCardsInDeck)")
                 .foregroundStyle(.white).font(.largeTitle)
+                .fontWeight(.bold)
         }
         .onTapGesture {
             if viewModel.activePlayer == nil {
-//                dealCards(1) //user intent
-                    dealCards(Constants.incrementalDealCount) //user intent
+                dealCards(Constants.incrementalDealCount) //user intent
             }
         }
         
@@ -344,12 +344,6 @@ struct SetGameView: View {
         }
         static let mismatchString = "☠️☠️☠️"
         static let timeOverString = "⏰⏰⏰"
-
-        //        struct FontSize {
-        //            static let largest: CGFloat = 200
-        //            static let smallest: CGFloat = 10
-        //            static let scaleFactor = smallest / largest
-        //        }
     }
 
 }

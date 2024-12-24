@@ -87,13 +87,13 @@ struct SetGame {
     }
     
     mutating func addScoreForMatch() {
-        if activePlayer == nil {return}
-        score[activePlayer!] += Constants.scoreForMatch
+        guard let numPlayer = activePlayer else { return }
+        score[numPlayer] += Constants.scoreForMatch
     }
     
     mutating func addScoreForMismatch() {
-        if activePlayer == nil {return}
-        score[activePlayer!] += Constants.scoreForMismatch
+        guard let numPlayer = activePlayer else { return }
+        score[numPlayer] += Constants.scoreForMismatch
     }
     
     mutating func springCard(_ card: Card) {
