@@ -113,11 +113,12 @@ struct SetGameView: View {
         selectedCardIDs.append(cardID)
         if selectedCardIDs.count == 3 {
             if matched {
+                viewModel.addScoreForMatch()
+                viewModel.setActivePlayer(nil)
                 withAnimation(.easeInOut(duration: 2.0)) {
                     spinCard = true
                 } completion: {
                     spinCard = false
-                    viewModel.addScoreForMatch()
                     withAnimation(dealAnimation) {
                         for i in selectedCardIDs {
                             discarded[playerNum].append(i)
