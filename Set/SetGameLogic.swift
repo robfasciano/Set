@@ -185,17 +185,18 @@ struct SetGame {
         return cards[0] //should never get here
     }
     
-    func anyVisibleMatches(CardIDs: [Card.ID]) -> Bool {
+    func VisibleMatches(CardIDs: [Card.ID]) -> Int {
+        var count = 0
             for i in 0..<CardIDs.count {
                 for j in i+1..<CardIDs.count {
                     for k in j+1..<CardIDs.count {
                         if threeCardsMatch([card(from: CardIDs[i]), card(from: CardIDs[j]), card(from: CardIDs[k])]) {
-                            return true
+                            count += 1
                         }
                     }
                 }
             }
-            return false
+            return count
         }
     
 //    mutating func removeMatch(player: Int) {

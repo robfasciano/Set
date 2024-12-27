@@ -139,8 +139,6 @@ struct SetGameView: View {
                 }
                 viewModel.addScoreForMismatch()
             }
-               
-            
         }
     }
     
@@ -162,9 +160,11 @@ struct SetGameView: View {
     
     var bottomButtons: some View {
         VStack {
-            Text("No Matches Possible").multilineTextAlignment(.center)
+            Text(viewModel.anyVisibleMatches(IDs: dealt) ? "\(viewModel.numberOfVisibleMatches(IDs: dealt)) Matches Possible" : "No Matches Possible")
+                .multilineTextAlignment(.center)
                 .font(.largeTitle).fontWeight(.heavy)
-                .foregroundStyle(viewModel.anyVisibleMatches(IDs: dealt) ? .clear : .red)
+                .foregroundStyle(viewModel.anyVisibleMatches(IDs: dealt) ? .black : .red)
+                .animation(.easeInOut, value: dealt)
             HStack {
                 VStack {
                     Text("Players").font(.largeTitle)

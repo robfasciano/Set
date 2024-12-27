@@ -56,9 +56,14 @@ class BasicSetViewModel: ObservableObject {
     }
     
     func anyVisibleMatches(IDs: [SetGame.Card.ID]) -> Bool {
-        model.anyVisibleMatches(CardIDs: IDs)
+        model.VisibleMatches(CardIDs: IDs) > 0
     }
 
+    func numberOfVisibleMatches(IDs: [SetGame.Card.ID]) -> Int {
+        model.VisibleMatches(CardIDs: IDs)
+    }
+
+    
     //TODO: I think I could make numPlayers a let in logic
     var numPlayers: Int {
         get { model.numPlayers }
