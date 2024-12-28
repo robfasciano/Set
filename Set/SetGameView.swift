@@ -176,7 +176,7 @@ struct SetGameView: View {
             Text(viewModel.anyVisibleMatches(IDs: dealt) ? "\(viewModel.numberOfVisibleMatches(IDs: dealt)) Matches Possible" : "No Matches Possible")
                 .multilineTextAlignment(.center)
                 .font(.largeTitle).fontWeight(.heavy)
-                .foregroundStyle(viewModel.anyVisibleMatches(IDs: dealt) ? .black : .red)
+                .foregroundStyle(viewModel.anyVisibleMatches(IDs: dealt) ? .blue : .red)
                 .animation(.easeInOut, value: dealt)
             ZStack {
             HStack {
