@@ -17,6 +17,8 @@ struct SetGame {
     private var score: Array<Int>
     
     var activePlayer: Int? = nil
+    
+    var markedCards = [SetGame.Card.ID]()
 
     
     init(Players numPlayers: Int) {
@@ -66,6 +68,39 @@ struct SetGame {
         case color1
         case color2
         case color3
+    }
+    
+    mutating func setMarkedCards(CardIDs: [Card.ID], cardCount: Int = 1) {
+        if cardCount < 1 { return }
+        var foundMatch = false
+        
+        for i in 0..<CardIDs.count {
+            foundMatch = false
+            for j in 0..<CardIDs.count {
+                for k in 0..<CardIDs.count {
+                    if uniqueIDs(i, j, k) && threeCardsMatch([card(from: CardIDs[i]), card(from: CardIDs[j]), card(from: CardIDs[k])]) {
+                         foundMatch = true
+                    }
+                }
+            }
+            if !foundMatch && markedCards.count < cardCount {
+                markedCards.append(CardIDs[i])
+            }
+        }
+        guard let player = activePlayer else { return }
+        addScore(player, points: Constants.scoreForRemoveCard)
+    }
+    
+    func uniqueIDs (_ a: Int, _ b: Int, _ c: Int) -> Bool {
+        if a != b && b != c && c != a {
+            return true
+        } else {
+            return false
+        }
+    }
+    
+    mutating func clearMarkedCards() {
+        markedCards = []
     }
     
     func score(player: Int) -> Int {
@@ -309,6 +344,7 @@ struct SetGame {
         static let scoreForMatch = 2
         static let scoreForMismatch = -2
         static let scoreForAddTimne = -1
+        static let scoreForRemoveCard = -1
     }
     
 }

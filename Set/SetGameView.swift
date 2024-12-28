@@ -27,7 +27,6 @@ struct SetGameView: View {
     @State var ShowRemoveCardButton = false
     
     private let advancedMode = true
-
     
     let cardShape = RoundedRectangle(cornerRadius: 9)
     
@@ -89,8 +88,19 @@ struct SetGameView: View {
                      selected: selectedCardIDs.contains(card.id) && viewModel.activePlayer != nil,
                      cardColor: selectedCardIDs.contains(card.id) && selectedCardIDs.count == 3 ? specialColor : viewModel.cardBackground)
             //matched
+
+            .overlay(Text (viewModel.activePlayer != nil
+                           && viewModel.markedCards.contains(card.id) ? Constants.hint.symbol : "")
+                .font(.system(size: 100))
+                .shadow(color: .black, radius: 10)
+//                .minimumScaleFactor(0.001)
+            )
+
+
             .rotationEffect(Angle(degrees: spinCard &&  selectedCardIDs.contains(card.id) ? 720 : 0))
             .scaleEffect (spinCard &&  selectedCardIDs.contains(card.id) ? 1.25 : 1)
+            
+            
 //            .zIndex(spinCard &&  selectedCardIDs.contains(card.id) ? 10 : 1)
             .matchedGeometryEffect(id: card.id, in: dealingNamespace)
             .matchedGeometryEffect(id: card.id, in: discardNamespace)
@@ -154,7 +164,7 @@ struct SetGameView: View {
     func deselectAll() {
         selectedCardIDs = []
         viewModel.setActivePlayer(nil)
-        
+        viewModel.clearMarkedCards()
     }
     
     private var matched: Bool {
@@ -221,6 +231,7 @@ struct SetGameView: View {
     
     var removeCard: some View {
         Button(action: {
+            viewModel.setMarkedCards(IDs: dealt, count: Constants.hint.count)
             withAnimation(dealAnimation) {
                 ShowRemoveCardButton = false
             }
@@ -404,6 +415,10 @@ struct SetGameView: View {
         }
         static let mismatchString = "☠️☠️☠️"
         static let timeOverString = "⏰⏰⏰"
+        struct hint {
+            static let symbol = "👎"
+            static let count = 2
+        }
     }
 
 }

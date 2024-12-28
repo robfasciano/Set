@@ -27,6 +27,18 @@ class BasicSetViewModel: ObservableObject {
             model.activePlayer
     }
     
+    var markedCards: Array<SetGame.Card.ID> {
+        model.markedCards
+    }
+    
+    func clearMarkedCards() {
+        model.clearMarkedCards()
+    }
+    
+    func setMarkedCards(IDs: [SetGame.Card.ID], count: Int) {
+        model.setMarkedCards(CardIDs: IDs, cardCount: count)
+    }
+
     func setActivePlayer(_ player: Int?) {
         model.activePlayer = player
         model.timerStart = Date()
