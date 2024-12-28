@@ -22,6 +22,11 @@ struct SetGameView: View {
     
     @State var showXXX = false
     @State var spinCard = false
+    
+    @State var showExtraTimeButton = false
+    @State var ShowRemoveCardButton = false
+    
+    private let advancedMode = true
 
     
     let cardShape = RoundedRectangle(cornerRadius: 9)
@@ -33,9 +38,7 @@ struct SetGameView: View {
                     discardColumn(topPlayer: 0)
                         .animation(.linear, value: viewModel.numPlayers)
                     cards //this animation is how displayed cards move when they change size
-                    //                    .animation(.easeIn(duration: 1.0), value: viewModel.cards)
                         .foregroundStyle(viewModel.cardBack)
-                    
                     discardColumn(topPlayer: 1)
                         .animation(.easeInOut, value: viewModel.numPlayers)
                 }
@@ -70,7 +73,7 @@ struct SetGameView: View {
             if viewModel.numPlayers > topPlayer + 4 {
                 discardPile(topPlayer + 4)
                 // .top seems to be top of entire view (almost)
-                //                    .transition(AsymmetricTransition(insertion: .push(from: .top), removal: .push(from: .bottom)))
+                // .transition(AsymmetricTransition(insertion: .push(from: .top), removal: .push(from: .bottom)))
                 Spacer()
             }
         }
@@ -165,25 +168,78 @@ struct SetGameView: View {
                 .font(.largeTitle).fontWeight(.heavy)
                 .foregroundStyle(viewModel.anyVisibleMatches(IDs: dealt) ? .black : .red)
                 .animation(.easeInOut, value: dealt)
+            ZStack {
             HStack {
-                VStack {
-                    Text("Players").font(.largeTitle)
-                    Stepper ("Player", value: $viewModel.numPlayers, in: 1...discarded.count)
-                        .labelsHidden()
-                        .onChange(of: viewModel.numPlayers) {
-                            withAnimation(dealAnimation) {
-                                clearBoard()
+                    VStack {
+                        Text("Players").font(.largeTitle)
+                        Stepper ("Player", value: $viewModel.numPlayers, in: 1...discarded.count)
+                            .labelsHidden()
+                            .onChange(of: viewModel.numPlayers) {
+                                withAnimation(dealAnimation) {
+                                    clearBoard()
+                                }
                             }
-                        }
+                    }
+                    Spacer()
+                    newGame
                 }
-                Spacer()
                 deck
-                Spacer()
-                newGame
+
+                HStack {
+                    Spacer()
+                    extraTime
+                    Spacer()
+                    Spacer()
+                    removeCard
+                    Spacer()
+
+                }
             }
         }
     }
     
+    
+    var extraTime: some View {
+        Button(action: {
+            withAnimation(dealAnimation) {
+                showExtraTimeButton = false
+                viewModel.addTime()
+            }
+        })
+        {
+            VStack{
+                if showExtraTimeButton && viewModel.activePlayer != nil {
+                    Text("+⏰")
+                        .font(.system(size: 70))
+                        .fontWeight(.black)
+                    
+                }
+            }
+        }
+    }
+    
+    
+    var removeCard: some View {
+        Button(action: {
+            withAnimation(dealAnimation) {
+                ShowRemoveCardButton = false
+            }
+        })
+        {
+            VStack{
+                if ShowRemoveCardButton && viewModel.activePlayer != nil {
+                    Image(systemName: "minus.diamond.fill")
+                        .font(.system(size: 40))
+                        .fontWeight(.black)
+                        .cardify(isFaceUp: true, isSelected: false, background: .white)
+                        .frame(
+                            width: Constants.drawDeckHeight * Constants.aspectRatio,
+                            height: Constants.drawDeckHeight)
+                }
+            }
+        }
+    }
+
     private let dealAnimation: Animation = .easeIn(duration: Constants.deal.speed)
     private let dealInterval: TimeInterval = Constants.deal.interval
     
@@ -212,6 +268,9 @@ struct SetGameView: View {
         dealt = []
         discarded = [[],[],[],[],[],[]]
         deselectAll()
+        showExtraTimeButton = false
+        ShowRemoveCardButton = false
+
     }
     
     var newGame: some View {
@@ -220,7 +279,6 @@ struct SetGameView: View {
                 clearBoard()
             } completion: {
                 viewModel.newGame() //user intent
-//                dealCards(1)
                 dealCards(Constants.newDealCount)
                 addCardsToBoard()
             }
@@ -255,10 +313,13 @@ struct SetGameView: View {
             }
             Text("Player \(player + 1)").font(.title)
             Text("\(viewModel.score(player))").font(.largeTitle).fontWeight(.heavy)
+                .animation(.easeInOut(duration: 2.0))
         }
         .onTapGesture {
             deselectAll()
             viewModel.setActivePlayer(player)
+            showExtraTimeButton = advancedMode
+            ShowRemoveCardButton = advancedMode
         }
         .disabled(viewModel.activePlayer != nil)
     }

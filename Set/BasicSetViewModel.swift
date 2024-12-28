@@ -77,8 +77,13 @@ class BasicSetViewModel: ObservableObject {
     func addScoreForMatch() {
         model.addScoreForMatch()
     }
+    
     func addScoreForMismatch() {
         model.addScoreForMismatch()
+    }
+    
+    func addTime() {
+        model.addTime()
     }
 
     func score(_ player: Int) -> Int {

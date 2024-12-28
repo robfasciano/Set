@@ -235,7 +235,13 @@ struct SetGame {
             return Constants.timeToChoose
         }
     }
-
+    
+    mutating func addTime() {
+        guard let start = timerStart else { return }
+        timerStart = start.addingTimeInterval(Constants.timeToChoose)
+        guard let player = activePlayer else { return }
+        addScore(player, points: Constants.scoreForAddTimne)
+    }
     
     struct Card: Equatable, Identifiable, CustomDebugStringConvertible {
         var debugDescription: String {
@@ -300,8 +306,9 @@ struct SetGame {
     
     struct Constants {
         static let timeToChoose = 6.0
-        static let scoreForMatch = 1
-        static let scoreForMismatch = -1
+        static let scoreForMatch = 2
+        static let scoreForMismatch = -2
+        static let scoreForAddTimne = -1
     }
     
 }
