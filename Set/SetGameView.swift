@@ -87,8 +87,6 @@ struct SetGameView: View {
                      faceUp: true,
                      selected: selectedCardIDs.contains(card.id) && viewModel.activePlayer != nil,
                      cardColor: selectedCardIDs.contains(card.id) && selectedCardIDs.count == 3 ? specialColor : viewModel.cardBackground)
-            //matched
-
             .overlay(Text (viewModel.activePlayer != nil
                            && viewModel.markedCards.contains(card.id) ? Constants.hint.symbol : "")
                 .font(.system(size: 100))
@@ -96,12 +94,8 @@ struct SetGameView: View {
 //                .minimumScaleFactor(0.001)
             )
 
-
-            .rotationEffect(Angle(degrees: spinCard &&  selectedCardIDs.contains(card.id) ? 720 : 0))
+            .rotationEffect(spinCard &&  selectedCardIDs.contains(card.id) ? Angle(degrees: 720) : card.rotation/Constants.angleScale)
             .scaleEffect (spinCard &&  selectedCardIDs.contains(card.id) ? 1.25 : 1)
-            
-            
-//            .zIndex(spinCard &&  selectedCardIDs.contains(card.id) ? 10 : 1)
             .matchedGeometryEffect(id: card.id, in: dealingNamespace)
             .matchedGeometryEffect(id: card.id, in: discardNamespace)
             .transition(.asymmetric(insertion: .identity, removal: .identity))
@@ -314,6 +308,7 @@ struct SetGameView: View {
                     CardView(card, faceUp: true,
                              selected: false)
                     .foregroundStyle(viewModel.cardBack)
+                    .rotationEffect(card.rotation)
                     .matchedGeometryEffect(id: card.id, in: discardNamespace)
                     .transition(.asymmetric(insertion: .identity, removal: .identity))
                 }
@@ -333,6 +328,7 @@ struct SetGameView: View {
             ShowRemoveCardButton = advancedMode
         }
         .disabled(viewModel.activePlayer != nil)
+        .padding([.leading, .trailing], 30)
     }
     
     func countdown(_ player: Int) -> some View {
@@ -419,6 +415,7 @@ struct SetGameView: View {
             static let symbol = "👎"
             static let count = 2
         }
+        static let angleScale: Double = 80
     }
 
 }

@@ -133,7 +133,8 @@ private struct Constants {
                 symbol: .Squiggle,
                 count: .one,
                 shading: .striped,
-                color: .color1
+                color: .color1,
+                rotation: Angle(degrees: Double.random(in: -35...35))
             ), faceUp: true, selected: false).aspectRatio(3/4, contentMode: .fit)
             
             CardView(SetGame.Card(
@@ -144,7 +145,8 @@ private struct Constants {
                 symbol: .Diamond,
                 count: .two,
                 shading: .filled,
-                color: .color2
+                color: .color2,
+                rotation: Angle(degrees: Double.random(in: -35...35))
             ), faceUp: true, selected: false).aspectRatio(3/4, contentMode: .fit)
             
             CardView(SetGame.Card(
@@ -155,7 +157,8 @@ private struct Constants {
                 symbol: .Line,
                 count: .three,
                 shading: .striped,
-                color: .color3
+                color: .color3,
+                rotation: Angle(degrees: Double.random(in: -35...35))
             ), faceUp: true, selected: false).aspectRatio(3/4, contentMode: .fit)
         }
         HStack {
@@ -167,7 +170,8 @@ private struct Constants {
                 symbol: .Line,
                 count: .two,
                 shading: .open,
-                color: .color1
+                color: .color1,
+                rotation: Angle(degrees: Double.random(in: -35...35))
             ), faceUp: false, selected: false).aspectRatio(3/4, contentMode: .fit)
             CardView(SetGame.Card(
                 //                isDealt: true,
@@ -177,7 +181,8 @@ private struct Constants {
                 symbol: .Line,
                 count: .two,
                 shading: .open,
-                color: .color2
+                color: .color2,
+                rotation: Angle(degrees: Double.random(in: -35...35))
             ), faceUp: true, selected: true).aspectRatio(3/4, contentMode: .fit)
             CardView(SetGame.Card(
                 //                isDealt: true,
@@ -187,7 +192,8 @@ private struct Constants {
                 symbol: .Squiggle,
                 count: .three,
                 shading: .filled,
-                color: .color3
+                color: .color3,
+                rotation: Angle(degrees: Double.random(in: -35...35))
             ), faceUp: true, selected: true).aspectRatio(3/4, contentMode: .fit)
         }
     }.foregroundStyle(.orange)

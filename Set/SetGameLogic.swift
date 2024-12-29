@@ -32,7 +32,8 @@ struct SetGame {
                             symbol: localSymbol,
                             count: localCount,
                             shading: localShading,
-                            color: localColor
+                            color: localColor,
+                            rotation:  Angle(degrees: Double.random(in: -180...180))
                         ))
                     }
                 }
@@ -201,16 +202,6 @@ struct SetGame {
         return false
     }
     
-//    func getSelectedCards() -> [Card] {
-//        var returnVal: Array<Card> = []
-//        for i in cards {
-//            if i.isSelected {
-//                returnVal.append(i)
-//            }
-//        }
-//        return returnVal
-//    }
-    
     func card(from cardId: String) -> Card {
         for cardToCheck in cards {
             if cardToCheck.id == cardId {
@@ -233,16 +224,6 @@ struct SetGame {
             }
             return count
         }
-    
-//    mutating func removeMatch(player: Int) {
-//        for i in cards.indices {
-//            if cards[i].isSelected {
-//                cards[i].isMatched = true
-//                cards[i].discardDeck = player
-//                cards[i].isSelected = false
-//            }
-//        }
-//    }
     
     func indexOfChosen(_ card: Card) -> Int {
         var cardIndex = 0
@@ -291,6 +272,7 @@ struct SetGame {
         let count: symbolCount
         let shading: symbolShading
         let color: symbolColor
+        let rotation: Angle
         var id: String {
             CardDebugString(self)
         }
