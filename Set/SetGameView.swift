@@ -94,7 +94,7 @@ struct SetGameView: View {
 //                .minimumScaleFactor(0.001)
             )
 
-            .rotationEffect(spinCard &&  selectedCardIDs.contains(card.id) ? Angle(degrees: 720) : card.rotation/Constants.angleScale)
+            .rotationEffect(spinCard &&  selectedCardIDs.contains(card.id) ? Angle(degrees: 720) : card.rotation/Constants.anglescale.dealt)
             .scaleEffect (spinCard &&  selectedCardIDs.contains(card.id) ? 1.25 : 1)
             .matchedGeometryEffect(id: card.id, in: dealingNamespace)
             .matchedGeometryEffect(id: card.id, in: discardNamespace)
@@ -308,11 +308,10 @@ struct SetGameView: View {
                     CardView(card, faceUp: true,
                              selected: false)
                     .foregroundStyle(viewModel.cardBack)
-                    .rotationEffect(card.rotation)
+                    .rotationEffect(card.rotation/Constants.anglescale.discard)
                     .matchedGeometryEffect(id: card.id, in: discardNamespace)
                     .transition(.asymmetric(insertion: .identity, removal: .identity))
-                }
-                )
+                })
                 if viewModel.activePlayer == player {
                     countdown(player)
                 }
@@ -347,7 +346,16 @@ struct SetGameView: View {
                         width: Constants.discardDeck.height * Constants.aspectRatio,
                         height: Constants.discardDeck.height * (viewModel.timerPercentRemaining / 100.0))
             }
+            .rotationEffect(getCountdownAngle())
         }
+    }
+    
+    private func getCountdownAngle() -> Angle {
+        guard let player = viewModel.activePlayer else {return Angle.zero}
+        if discarded[player].count != 0 {
+            return viewModel.idToAngle(discarded[player].last!) / Constants.anglescale.discard
+        }
+        return Angle.zero
     }
     
     private func isDealt(_ cardID: SetGame.Card.ID) -> Bool {
@@ -415,7 +423,10 @@ struct SetGameView: View {
             static let symbol = "👎"
             static let count = 2
         }
-        static let angleScale: Double = 80
+        struct anglescale {
+            static let dealt: Double = 80
+            static let discard: Double = 10
+ }
     }
 
 }

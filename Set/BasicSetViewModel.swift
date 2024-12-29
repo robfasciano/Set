@@ -102,6 +102,10 @@ class BasicSetViewModel: ObservableObject {
         model.score(player: player)
     }
     
+    func idToAngle(_ cardID: SetGame.Card.ID) -> Angle {
+        return model.card(from: cardID).rotation
+    }
+    
     //MARK: Intents
     func newGame() {
         model.activePlayer = nil
