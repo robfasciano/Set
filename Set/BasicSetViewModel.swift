@@ -106,6 +106,11 @@ class BasicSetViewModel: ObservableObject {
         return model.card(from: cardID).rotation
     }
     
+    func idToCard(_ cardID: SetGame.Card.ID) -> SetGame.Card {
+        return model.card(from: cardID)
+    }
+
+    
     //MARK: Intents
     func newGame() {
         model.activePlayer = nil

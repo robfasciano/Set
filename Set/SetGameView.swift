@@ -304,7 +304,9 @@ struct SetGameView: View {
                     width: Constants.discardDeck.height * Constants.aspectRatio,
                     height: Constants.discardDeck.height)
                 .overlay(cardShape.fill(.gray))
-                .overlay(ForEach (viewModel.cards.filter{discarded[player].contains($0.id)}) { card in
+//                .overlay(ForEach (viewModel.cards.filter{discarded[player].contains($0.id)})
+                .overlay(ForEach (discards(for: player))
+                         { card in
                     CardView(card, faceUp: true,
                              selected: false)
                     .foregroundStyle(viewModel.cardBack)
@@ -328,6 +330,15 @@ struct SetGameView: View {
         }
         .disabled(viewModel.activePlayer != nil)
         .padding([.leading, .trailing], 30)
+    }
+    
+    
+    func discards(for player: Int) -> [SetGame.Card] {
+        var pile = [SetGame.Card]()
+        for i in discarded[player] {
+            pile.append(viewModel.idToCard(i))
+        }
+        return pile
     }
     
     func countdown(_ player: Int) -> some View {
