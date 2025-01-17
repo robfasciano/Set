@@ -18,6 +18,7 @@
 		1E09C1372D199DED00B94FA5 /* SetGameLogic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E09C12B2D199DED00B94FA5 /* SetGameLogic.swift */; };
 		1E09C1382D199DED00B94FA5 /* SetGameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E09C12C2D199DED00B94FA5 /* SetGameView.swift */; };
 		1E09C1392D199DED00B94FA5 /* Squiggle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E09C12D2D199DED00B94FA5 /* Squiggle.swift */; };
+		1E4924042D39FB66005145E4 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E4924032D39FB66005145E4 /* ConfettiView.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +33,8 @@
 		1E09C12B2D199DED00B94FA5 /* SetGameLogic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameLogic.swift; sourceTree = "<group>"; };
 		1E09C12C2D199DED00B94FA5 /* SetGameView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SetGameView.swift; sourceTree = "<group>"; };
 		1E09C12D2D199DED00B94FA5 /* Squiggle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Squiggle.swift; sourceTree = "<group>"; };
+		1E4924032D39FB66005145E4 /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
+		1E77F9C72D29B201006CFB54 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		1EDAE6932CC67045005BC26D /* Set.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Set.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -57,16 +60,18 @@
 		1E09C12E2D199DED00B94FA5 /* Set */ = {
 			isa = PBXGroup;
 			children = (
+				1E77F9C72D29B201006CFB54 /* Info.plist */,
+				1E09C1252D199DED00B94FA5 /* Assets.xcassets */,
 				1E09C12A2D199DED00B94FA5 /* SetApp.swift */,
 				1E09C12C2D199DED00B94FA5 /* SetGameView.swift */,
 				1E09C1262D199DED00B94FA5 /* BasicSetViewModel.swift */,
 				1E09C12B2D199DED00B94FA5 /* SetGameLogic.swift */,
 				1E09C1282D199DED00B94FA5 /* CardView.swift */,
 				1E09C1272D199DED00B94FA5 /* Cardify.swift */,
+				1E4924032D39FB66005145E4 /* ConfettiView.swift */,
 				1E09C1292D199DED00B94FA5 /* Diamond.swift */,
 				1E09C12D2D199DED00B94FA5 /* Squiggle.swift */,
 				1E09C1242D199DED00B94FA5 /* AspectVGrid.swift */,
-				1E09C1252D199DED00B94FA5 /* Assets.xcassets */,
 				1E09C1232D199DED00B94FA5 /* Preview Content */,
 			);
 			path = Set;
@@ -163,6 +168,7 @@
 			files = (
 				1E09C1312D199DED00B94FA5 /* AspectVGrid.swift in Sources */,
 				1E09C1322D199DED00B94FA5 /* BasicSetViewModel.swift in Sources */,
+				1E4924042D39FB66005145E4 /* ConfettiView.swift in Sources */,
 				1E09C1332D199DED00B94FA5 /* Cardify.swift in Sources */,
 				1E09C1342D199DED00B94FA5 /* CardView.swift in Sources */,
 				1E09C1352D199DED00B94FA5 /* Diamond.swift in Sources */,
@@ -306,9 +312,9 @@
 				DEVELOPMENT_TEAM = GBD73BJ938;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Set/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -335,9 +341,9 @@
 				DEVELOPMENT_TEAM = GBD73BJ938;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Set/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				LD_RUNPATH_SEARCH_PATHS = (

@@ -32,6 +32,8 @@ struct SetGameView: View {
     
     var body: some View {
         ZStack {
+            Color(Color("Playmat"))
+                .ignoresSafeArea()
             VStack {
                 HStack{
                     discardColumn(topPlayer: 0)
