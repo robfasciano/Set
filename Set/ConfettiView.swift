@@ -172,8 +172,8 @@ struct DisplayConfettiModifier: ViewModifier {
     @Binding var isActive: Bool //{
     @State private var opacity = 1.0 //{
 
-    private let animationTime = 2.5
-    private let fadeTime = 1.0
+    private let animationTime = 5.0
+    private let fadeTime = 2.0
     
     func body(content: Content) -> some View {
         if !isActive {

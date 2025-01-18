@@ -25,6 +25,7 @@ struct SetGameView: View {
     
     @State var showExtraTimeButton = false
     @State var ShowRemoveCardButton = false
+    @State var showConfetti = false
     
     private let advancedMode = true
     
@@ -54,6 +55,8 @@ struct SetGameView: View {
                 .opacity(showXXX ? 0 : 1)
                 .multilineTextAlignment(.center)
                 .foregroundStyle(.red)
+            Color(.clear)
+                .displayConfetti(isActive: $showConfetti)
         }
     }
 
@@ -136,6 +139,10 @@ struct SetGameView: View {
                         addCardsToBoard()
                     }
                     deselectAll()
+                    if numCardsInDeck == 0 && !viewModel.anyVisibleMatches(IDs: dealt) {
+                        showConfetti = true
+                    }
+
                 }
             } else {
                 viewModel.displayString = Constants.mismatchString
@@ -155,6 +162,9 @@ struct SetGameView: View {
         while !viewModel.anyVisibleMatches(IDs: dealt) && numCardsInDeck > 0 {
             dealCards(Constants.incrementalDealCount)
         }
+//        if numCardsInDeck == 0 && viewModel.anyVisibleMatches(IDs: dealt) {
+//            showConfetti = true
+//        }
     }
     
     func deselectAll() {
