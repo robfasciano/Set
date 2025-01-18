@@ -11,7 +11,6 @@ import SwiftUI
 
 struct TempView: View {
     @State private var showConfetti = false
-    @State private var redlight = false
     
     var body: some View {
         ZStack {
@@ -23,9 +22,6 @@ struct TempView: View {
                     showConfetti = true
                     print("\(showConfetti ? "start" : "stop") the rain.")
                 }
-                Button("\n\nRedlight!\n\n") {
-                    redlight.toggle()
-                }
                 .tint(showConfetti ? .red : .green)
             }
             .buttonStyle(.borderedProminent)
@@ -36,23 +32,51 @@ struct TempView: View {
     }
 }
 
+private struct Constants {
+    static let widths: [CGFloat] = [40, 60, 80]
+    static let height: CGFloat = 40
+    static let colors: [Color] = [.red, .green, .purple]
+}
+
+func getPattern(color: Color, pattern which: Int) -> [Color] {
+    switch which {
+    case 1:
+        return [.clear]
+    case 2:
+        var colorArray = [color]
+        for _ in 1...20 {
+            colorArray.append(.clear)
+            colorArray.append(.clear)
+            colorArray.append(color)
+        }
+        return colorArray
+    default:
+        return [color]
+    }
+}
 //can't seem to figure out how to combine code for these 3 functions
 struct ConfettiView1: View {
     @State var animate = false
     @State var xSpeed = Double.random(in: 0.7...2)
     @State var zSpeed = Double.random(in: 1...2)
     @State var anchor = CGFloat.random(in: 0...1).rounded()
+    @State var pattern = Int.random(in: 1...3)
     
+    let color = Constants.colors.randomElement() ?? Color.green
+
     var body: some View {
-            Squiggle()
-                .fill([Color.orange, Color.green, Color.blue, Color.red, Color.yellow].randomElement() ?? Color.green)
-                .animation(.none, value: animate) //to keep colors from changing during animation
-                .frame(width: [20, 30, 40].randomElement()!, height: 20)
-                .onAppear(perform: { animate = true })
-                .rotation3DEffect(.degrees(animate ? 360 : 0), axis: (x: 1, y: 0, z: 0))
-                .animation(Animation.linear(duration: xSpeed).repeatForever(autoreverses: false), value: animate)
-                .rotation3DEffect(.degrees(animate ? [-360, 360].randomElement()! : 0), axis: (x: 0, y: 0, z: 1), anchor: UnitPoint(x: anchor, y: anchor))
-                .animation(Animation.linear(duration: zSpeed).repeatForever(autoreverses: false), value: animate)
+        Squiggle()
+            .fill(LinearGradient(colors: getPattern(color: color, pattern: pattern),
+                                 startPoint: UnitPoint(x: 0, y: 1.5),
+                                      endPoint: UnitPoint(x: 1, y: 0)))
+            .stroke(color, lineWidth: 4.0)
+            .animation(.none, value: animate) //to keep colors from changing during animation
+            .frame(width: Constants.widths.randomElement()!, height: Constants.height)
+            .onAppear(perform: { animate = true })
+            .rotation3DEffect(.degrees(animate ? 360 : 0), axis: (x: 1, y: 0, z: 0))
+            .animation(Animation.linear(duration: xSpeed).repeatForever(autoreverses: false), value: animate)
+            .rotation3DEffect(.degrees(animate ? [-360, 360].randomElement()! : 0), axis: (x: 0, y: 0, z: 1), anchor: UnitPoint(x: anchor, y: anchor))
+            .animation(Animation.linear(duration: zSpeed).repeatForever(autoreverses: false), value: animate)
     }
 }
 
@@ -61,17 +85,23 @@ struct ConfettiView2: View {
     @State var xSpeed = Double.random(in: 0.7...2)
     @State var zSpeed = Double.random(in: 1...2)
     @State var anchor = CGFloat.random(in: 0...1).rounded()
-    
+    @State var pattern = Int.random(in: 1...3)
+
+    let color = Constants.colors.randomElement() ?? Color.green
+
     var body: some View {
-            Diamond()
-                .fill([Color.orange, Color.green, Color.blue, Color.red, Color.yellow].randomElement() ?? Color.green)
-                .animation(.none, value: animate) //to keep colors from changing during animation
-                .frame(width: [20, 30, 40].randomElement()!, height: 20)
-                .onAppear(perform: { animate = true })
-                .rotation3DEffect(.degrees(animate ? 360 : 0), axis: (x: 1, y: 0, z: 0))
-                .animation(Animation.linear(duration: xSpeed).repeatForever(autoreverses: false), value: animate)
-                .rotation3DEffect(.degrees(animate ? [-360, 360].randomElement()! : 0), axis: (x: 0, y: 0, z: 1), anchor: UnitPoint(x: anchor, y: anchor))
-                .animation(Animation.linear(duration: zSpeed).repeatForever(autoreverses: false), value: animate)
+        Diamond()
+            .fill(LinearGradient(colors: getPattern(color: color, pattern: pattern),
+                                      startPoint: UnitPoint(x: 0, y: 0),
+                                      endPoint: UnitPoint(x: 1, y: 0)))
+            .stroke(color, lineWidth: 4.0)
+            .animation(.none, value: animate) //to keep colors from changing during animation
+            .frame(width: Constants.widths.randomElement()!, height: Constants.height)
+            .onAppear(perform: { animate = true })
+            .rotation3DEffect(.degrees(animate ? 360 : 0), axis: (x: 1, y: 0, z: 0))
+            .animation(Animation.linear(duration: xSpeed).repeatForever(autoreverses: false), value: animate)
+            .rotation3DEffect(.degrees(animate ? [-360, 360].randomElement()! : 0), axis: (x: 0, y: 0, z: 1), anchor: UnitPoint(x: anchor, y: anchor))
+            .animation(Animation.linear(duration: zSpeed).repeatForever(autoreverses: false), value: animate)
     }
 }
 
@@ -80,12 +110,18 @@ struct ConfettiView3: View {
     @State var xSpeed = Double.random(in: 0.7...2)
     @State var zSpeed = Double.random(in: 1...2)
     @State var anchor = CGFloat.random(in: 0...1).rounded()
-    
+    @State var pattern = Int.random(in: 1...3)
+
+    let color = Constants.colors.randomElement() ?? Color.green
+
     var body: some View {
-        RoundedRectangle(cornerRadius: 9.0)
-                .fill([Color.orange, Color.green, Color.blue, Color.red, Color.yellow].randomElement() ?? Color.green)
+        RoundedRectangle(cornerRadius: 50.0)
+            .fill(LinearGradient(colors: getPattern(color: color, pattern: pattern),
+                                      startPoint: UnitPoint(x: 0, y: 0),
+                                      endPoint: UnitPoint(x: 1, y: 0)))
+            .stroke(color, lineWidth: 4.0)
                 .animation(.none, value: animate) //to keep colors from changing during animation
-                .frame(width: [20, 30, 40].randomElement()!, height: 20)
+                .frame(width: Constants.widths.randomElement()!, height: Constants.height)
                 .onAppear(perform: { animate = true })
                 .rotation3DEffect(.degrees(animate ? 360 : 0), axis: (x: 1, y: 0, z: 0))
                 .animation(Animation.linear(duration: xSpeed).repeatForever(autoreverses: false), value: animate)
@@ -96,7 +132,7 @@ struct ConfettiView3: View {
 
 
 struct ConfettiContainerView: View {
-    var count: Int = 300
+    var count: Int = 200
     @State var yPosition: CGFloat = 0
 
     var body: some View {

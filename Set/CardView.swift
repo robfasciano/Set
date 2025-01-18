@@ -46,10 +46,10 @@ struct CardView: View {
     }
     
     struct oneShape: View {
-        let card: SetGame.Card
+        let card: Card
         let backColor: Color
 
-        init(_ card: SetGame.Card, _ backColor: Color) {
+        init(_ card: Card, _ backColor: Color) {
             self.card = card
 //            self.backColor = backColor
             self.backColor = .white
@@ -58,47 +58,46 @@ struct CardView: View {
         var body: some View {
             switch card.symbol {
             case .Diamond:
-                Diamond().fill(LinearGradient(colors: pattern(card, backColor),
+                Diamond().fill(LinearGradient(colors: pattern(card),
                                               startPoint: UnitPoint(x: 0, y: 0),
                                               endPoint: UnitPoint(x: 1, y: 0)))
                 .stroke(color(card), lineWidth: 4)
                 .aspectRatio(Constants.shapeAspect, contentMode: .fit)
             case .Squiggle:
                 Squiggle().fill(
-                    LinearGradient(colors: pattern(card, backColor),
+                    LinearGradient(colors: pattern(card),
                                    startPoint: UnitPoint(x: 0, y: 1.5),
                                    endPoint: UnitPoint(x: 1, y: 0)))
                 .stroke(color(card), lineWidth: 4)
                 .rotationEffect(Angle(degrees: 25))
                 .aspectRatio(Constants.shapeAspect, contentMode: .fit)
             case .Line:
-                RoundedRectangle(cornerRadius: 50).fill(LinearGradient(colors: pattern(card, backColor),startPoint: UnitPoint(x: 0, y: 0), endPoint: UnitPoint(x: 1, y: 0)))
+                RoundedRectangle(cornerRadius: 50).fill(LinearGradient(colors: pattern(card),startPoint: UnitPoint(x: 0, y: 0), endPoint: UnitPoint(x: 1, y: 0)))
                     .stroke(color(card), lineWidth: 4)
                     .aspectRatio(Constants.shapeAspect, contentMode: .fit)
             }
-
         }
         
         
-        func pattern(_ which: SetGame.Card, _ backColor: Color) -> [Color] {
+        func pattern(_ which: Card) -> [Color] {
             switch which.shading {
             case .open:
-                return [backColor]
+                return [.clear]
             case .striped:
                 var colorArray = [color(card)]
                 for _ in 1...Constants.numStripes {
-                    colorArray.append(backColor)
-                    colorArray.append(backColor)
-                    colorArray.append(backColor)
+                    colorArray.append(.clear)
+                    colorArray.append(.clear)
+                    colorArray.append(.clear)
                     colorArray.append(color(card))
                 }
                 return colorArray
             case .filled:
                 return [color(card)]
-            }
+ }
         }
         
-        func color(_ which: SetGame.Card) -> Color {
+        func color(_ which: Card) -> Color {
             switch which.color {
             case .color1:
                 return .red
